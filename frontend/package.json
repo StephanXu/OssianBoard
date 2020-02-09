@@ -9,9 +9,11 @@
     "proto": "pbjs -t json-module -w commonjs -o src/proto/proto.js  src/proto/*.proto"
   },
   "dependencies": {
+    "@microsoft/signalr": "^3.1.0",
     "axios": "^0.19.1",
     "core-js": "^3.4.4",
     "element-ui": "^2.13.0",
+    "js-cookie": "^2.2.1",
     "protobufjs": "^6.8.8",
     "vue": "^2.6.10",
     "vue-router": "^3.1.3",
