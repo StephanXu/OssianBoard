@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Logger.Controllers
 {
-    [Authorize(Roles = "Admin,Member")]
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ArgumentController : ControllerBase

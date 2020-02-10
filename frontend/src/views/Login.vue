@@ -3,7 +3,7 @@
     <v-content>
       <v-container
         class="fill-height"
-        fluid
+
       >
         <v-row
           align="center"
@@ -56,8 +56,6 @@
 </template>
 
 <script>
-// import {HubConnectionBuilder} from '@microsoft/signalr'
-
 export default {
   data() {
     return {
@@ -70,7 +68,6 @@ export default {
   },
   methods: {
     onLogin() {
-      // this.connection.invoke('AddLog', 'client1', 'var1', 1.2345)
       this.$store.dispatch('login', this.loginForm)
         .then(() => {
           console.log('loggin success')
@@ -79,19 +76,6 @@ export default {
     }
   },
   created() {
-    // this.connection = new HubConnectionBuilder()
-    //   .withUrl('/logger')
-    //   .build();
-    // this.connection.on('ReceiveLog', (clientId, varName, value) => {
-    //   console.log('Client: ' + clientId + '  varName: ' + varName + '  value: ' + value)
-    // })
-    // this.connection.start().then(() => {
-    //   console.log('Connection started')
-    //   this.connection.invoke('AddToViewer')
-    // }).catch(err => {
-    //   console.log(err)
-    // })
-
   }
 }
 </script>

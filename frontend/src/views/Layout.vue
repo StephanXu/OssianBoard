@@ -15,15 +15,17 @@
       </v-list>
 
       <v-divider></v-divider>
-      <v-list dense nav>
-        <v-list-item v-for="item in items" :key="item.title" link>
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+      <v-list dense nav flat>
+        <v-list-item-group v-model="currentView" color="primary">
+          <v-list-item v-for="item in items" :key="item.title" link @click="switchPage(item)">
+            <v-list-item-icon>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
       </v-list>
 
       <template v-slot:append>
@@ -33,9 +35,11 @@
       </template>
     </v-navigation-drawer>
 
-    <v-app-bar app clipped-left>
+    <v-app-bar app clipped-left color="blue darken-3" dark>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title>Nautilus Config Generator</v-toolbar-title>
+      <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+        <span class="title">Ossian Logger</span>
+      </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon>
         <v-icon @click="switchTheme">invert_colors</v-icon>
@@ -43,7 +47,9 @@
     </v-app-bar>
 
     <v-content>
-      <router-view :key="key"></router-view>
+      <transition name="scroll-x-reverse-transition" mode="out-in">
+        <router-view :key="key" />
+      </transition>
     </v-content>
 
     <v-footer app>
@@ -61,14 +67,22 @@ export default {
   },
   data: () => ({
     drawer: null,
+    currentView: null,
     items: [
       {
         icon: 'mdi-view-dashboard',
-        title: 'Arguments'
+        title: 'Arguments',
+        redirect: '/index'
       },
       {
-        icon: 'mdi-settings',
-        title: 'Settings'
+        icon: 'mdi-chart-areaspline',
+        title: 'Online Logger',
+        redirect: '/board'
+      },
+      {
+        icon: 'mdi-account',
+        title: 'Profile',
+        redirect: '/profile'
       }
     ]
   }),
@@ -85,6 +99,9 @@ export default {
     async logout() {
       await this.$store.dispatch('logout')
       this.$router.push({path: '/login'})
+    },
+    switchPage(row) {
+      this.$router.push({path: row.redirect})
     }
   }
 };

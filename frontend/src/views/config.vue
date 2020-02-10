@@ -1,6 +1,7 @@
 <template>
+  <v-container fluid>
 
-  <v-container class="fill-height" fluid>
+
     <v-snackbar v-model="successTip.visible" top color="success">
       {{ successTip.message }}
       <v-btn text @click="successTip.visible = false">好</v-btn>
@@ -10,15 +11,12 @@
       {{ errorTip.message }}
       <v-btn text @click="errorTip.visible = false">好</v-btn>
     </v-snackbar>
-
-
-
     <v-row align="center" justify="center">
       <v-col cols="12">
         <v-card
           v-for="cate in table"
           :key="cate.alias"
-          style="padding:20px;margin:20px"
+          style="padding:20px;margin-bottom:20px;max-width: 850px"
           class="mx-auto"
           tle
         >

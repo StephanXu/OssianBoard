@@ -21,6 +21,32 @@ const routes = [
     ]
   },
   {
+    path: '/board',
+    name: 'board',
+    component: Layout,
+    redirect: '/board/index',
+    children: [
+      {
+        path: 'index',
+        name: 'board',
+        component: () => import('@/views/OnlineLogger')
+      }
+    ]
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: Layout,
+    redirect: '/profile/index',
+    children: [
+      {
+        path: 'index',
+        name: 'profile',
+        component: () => import('@/views/Profile')
+      }
+    ]
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('../views/About.vue')

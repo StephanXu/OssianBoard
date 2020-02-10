@@ -14,10 +14,14 @@ namespace Logger.Hubs
 {
     public class Logger : Hub
     {
-        public async Task AddLog(string clientId, string varName, float value)
+        public async Task AddLog(string varName, float value, float time)
         {
-            System.Console.WriteLine(varName + " = " + value.ToString());
-            await Clients.Group("Viewer").SendAsync("ReceiveLog", clientId, varName, value);
+            await Clients.Group("Viewer").SendAsync(
+                "ReceiveLog",
+                Context.ConnectionId,
+                varName,
+                new List<float> {value},
+                new List<float> {time});
         }
 
         public async Task AddToViewer()
