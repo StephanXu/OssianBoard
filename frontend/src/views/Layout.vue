@@ -5,10 +5,10 @@
         <v-list-item link>
           <v-list-item-content>
             <v-list-item-title class="title">
-              {{alias}}
+              {{ alias }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              {{name}}
+              {{ name }}
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
@@ -17,7 +17,12 @@
       <v-divider></v-divider>
       <v-list dense nav flat>
         <v-list-item-group v-model="currentView" color="primary">
-          <v-list-item v-for="item in items" :key="item.title" link @click="switchPage(item)">
+          <v-list-item
+            v-for="item in items"
+            :key="item.title"
+            link
+            @click="switchPage(item)"
+          >
             <v-list-item-icon>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>
@@ -59,7 +64,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import { mapGetters } from "vuex";
 
 export default {
   props: {
@@ -70,26 +75,26 @@ export default {
     currentView: null,
     items: [
       {
-        icon: 'mdi-view-dashboard',
-        title: 'Arguments',
-        redirect: '/index'
+        icon: "mdi-view-dashboard",
+        title: "Arguments",
+        redirect: "/index"
       },
       {
-        icon: 'mdi-chart-areaspline',
-        title: 'Online Logger',
-        redirect: '/board'
+        icon: "mdi-chart-areaspline",
+        title: "Online Logger",
+        redirect: "/board"
       },
       {
-        icon: 'mdi-account',
-        title: 'Profile',
-        redirect: '/profile'
+        icon: "mdi-account",
+        title: "Profile",
+        redirect: "/profile"
       }
     ]
   }),
   computed: {
-    ...mapGetters(['name', 'alias']),
+    ...mapGetters(["name", "alias"]),
     key() {
-      return this.$route.path
+      return this.$route.path;
     }
   },
   methods: {
@@ -97,11 +102,11 @@ export default {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
     },
     async logout() {
-      await this.$store.dispatch('logout')
-      this.$router.push({path: '/login'})
+      await this.$store.dispatch("logout");
+      this.$router.push({ path: "/login" });
     },
     switchPage(row) {
-      this.$router.push({path: row.redirect})
+      this.$router.push({ path: row.redirect });
     }
   }
 };

@@ -1,0 +1,7 @@
+.vscode
+.vs
+doc/doxygen
+build
+CMakeSettings.json
+out
+Folder.DotSettings.user

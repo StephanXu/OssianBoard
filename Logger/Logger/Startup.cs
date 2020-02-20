@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Logger.Hubs;
 using Logger.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,6 +35,7 @@ namespace Logger
             services.AddSignalR();
             services.AddScoped<UserService>();
             services.AddScoped<ArgumentService>();
+            services.AddScoped<ILogService, LogService>();
             
             var key = Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings")["Secret"]);
             services.AddAuthentication(option =>
@@ -62,7 +64,8 @@ namespace Logger
             {
                 builder.WithOrigins(
                         "http://192.168.1.6/",
-                        "http://localhost:8080")
+                        "http://localhost:8080",
+                        "http://localhost:5000")
                     .AllowAnyHeader()
                     .WithMethods("GET", "POST")
                     .AllowCredentials();
@@ -82,7 +85,8 @@ namespace Logger
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<Hubs.Logger>("/logger");
+                endpoints.MapHub<LoggerHub>("/logger");
+                endpoints.MapHub<LogViewerHub>("/log-viewer");
             });
         }
     }
