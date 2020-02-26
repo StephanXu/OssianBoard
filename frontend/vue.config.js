@@ -4,7 +4,7 @@ module.exports = {
   ],
   devServer: {
     proxy: {
-      '^/logger': {
+      '^/log-viewer': {
         target: 'http://localhost:5000',
         ws: true,
         changeOrigin: true

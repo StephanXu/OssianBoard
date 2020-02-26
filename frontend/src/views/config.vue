@@ -1,7 +1,5 @@
 <template>
   <v-container fluid>
-
-
     <v-snackbar v-model="successTip.visible" top color="success">
       {{ successTip.message }}
       <v-btn text @click="successTip.visible = false">好</v-btn>

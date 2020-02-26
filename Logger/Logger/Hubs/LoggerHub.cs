@@ -38,7 +38,7 @@ namespace Logger.Hubs
         public async Task<string> CreateLog(string name, string description)
         {
             var log = await _logService.CreateLog(name, description);
-            await _logViewerHub.Clients.Group("Clients").SendAsync(
+            await _logViewerHub.Clients.All.SendAsync(
                 "RefreshLogsList",
                 _logService.ListLogs());
             return log == null ? "error" : log.Id;
@@ -46,8 +46,8 @@ namespace Logger.Hubs
 
         public async Task AddLog(string logId, IEnumerable<string> logs)
         {
-            await _logViewerHub.Clients.Group("Listen" + logId).SendAsync("ReceiveLog", logId, logs);
-            await _logService.AddRecord(logId, logs);
+            var records = _logService.AddRecord(logId, logs);
+            await _logViewerHub.Clients.Group("Listen" + logId).SendAsync("ReceiveLog", logId, records);
         }
 
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DnsClient.Protocol;
 using Logger.Models;
@@ -16,7 +17,7 @@ namespace Logger.Services
         public Task<LogModel> GetLog(string logId);
         public Task<LogModel> CreateLog(string name, string description);
         public IEnumerable<LogListItem> ListLogs();
-        public Task AddRecord(string logId, IEnumerable<string> record);
+        public Task<IEnumerable<RecordModel>> AddRecord(string logId, IEnumerable<string> record);
     }
 
     public class LogService : ILogService
@@ -42,27 +43,42 @@ namespace Logger.Services
                 CreateTime = DateTime.Now,
                 Name = name,
                 Description = description,
-                Log = new List<string>()
+                Log = new List<RecordModel>()
             };
             await _logCollection.InsertOneAsync(log);
             return log.Id == null ? null : log;
         }
 
-        public IEnumerable<LogListItem> ListLogs() => 
+        public IEnumerable<LogListItem> ListLogs() =>
             _logCollection.AsQueryable()
                 .Select(item => new LogListItem
                 {
                     Id = item.Id,
                     Name = item.Name,
                     Description = item.Description,
-                    CreateTime = item.CreateTime.ToLocalTime()
+                    CreateTime = item.CreateTime
                 });
 
-        public async Task AddRecord(string logId, IEnumerable<string> record)
+        public async Task<IEnumerable<RecordModel>> AddRecord(string logId, IEnumerable<string> record)
         {
             var log = (await _logCollection.FindAsync(item => item.Id == logId)).FirstOrDefault();
-            log.Log.AddRange(record);
+            var records = record.Select(item =>
+            {
+                var matches = Regex.Matches(item, @"\[.*?\]");
+                var matchesStr = 
+                    matches.Select(item => item.ToString().Substring(1, item.Length - 2).Trim())
+                    .ToList();
+                return new RecordModel
+                {
+                    Time = DateTime.Parse(matchesStr[0]),
+                    ThreadId = Int32.Parse(matchesStr[1]),
+                    Level = matchesStr[2],
+                    Content = item.Substring(matches.Last().Index + matches.Last().Length + 1).TrimEnd()
+                };
+            });
+            log.Log.AddRange(records);
             await _logCollection.ReplaceOneAsync(item => item.Id == logId, log);
+            return records;
         }
     }
 }

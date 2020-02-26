@@ -2,9 +2,12 @@
 //
 #include "LoggerClient.h"
 
+#include <fmt/format.h>
+
 #include <signalrclient/hub_connection_builder.h>
 #include <signalrclient/log_writer.h>
 #include <signalrclient/signalr_value.h>
+
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/base_sink.h>
@@ -96,14 +99,15 @@ int main()
 	auto onlineLogger = std::make_shared<spdlog::logger>(
 		"onlineLogger",
 		std::make_shared<online_logger_sink_mt>("http://host.docker.internal:5000/logger"));
-	
+	onlineLogger->set_pattern("[%Y-%m-%dT%T.%e%z] [%-5t] %^[%l]%$ %v");
 	spdlog::register_logger(onlineLogger);
 
 	std::default_random_engine random(std::time(nullptr));
 
 	while (true)
 	{
-		onlineLogger->info("Hello world: {}", random());
+		onlineLogger->log(static_cast<spdlog::level::level_enum>(random() % 6),
+						  "Hello world: {}", random());
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 	return 0;

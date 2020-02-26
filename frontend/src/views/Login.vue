@@ -70,7 +70,6 @@ export default {
     onLogin() {
       this.$store.dispatch('login', this.loginForm)
         .then(() => {
-          console.log('loggin success')
           this.$router.push({path: '/'})
         })
     }
