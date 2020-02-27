@@ -2,50 +2,34 @@
   <v-container fluid>
     <v-row align="center" justify="center">
       <v-col cols="12">
-        <v-expansion-panels multiple v-model="panelStatus">
-          <v-expansion-panel
-            v-for="(item, index) in logList"
-            :key="index"
-            @change="handlePanelChange(index)"
+        <v-card v-if="!isEmptyId">
+          <v-data-table
+            fixed-header
+            dense
+            calculate-widths
+            :headers="logTableHeader"
+            :items="logs"
+            item-key="time"
           >
-            <v-expansion-panel-header>
-              <v-row no-gutters>
-                <v-col cols="4">{{ item.name }}</v-col>
-                <v-col cols="4" class="text--secondary">
-                  <span>
-                    {{ item.description }}
-                  </span>
-                </v-col>
-                <v-col cols="4" class="text--secondary">
-                  <span>
-                    {{ item.createTime }}
-                  </span>
-                </v-col>
-              </v-row>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content style="margin: 0px;">
-              <v-data-table
-                fixed-header
-                dense
-                calculate-widths
-                hide-default-footer
-                height="300px"
-                :headers="logTableHeader"
-                :items="item.log"
-                item-key="time"
-                disable-pagination
-                must-sort
+            <template v-slot:top>
+              <v-toolbar flat>
+                <v-toolbar-title>Raw log</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-switch
+                  v-model="prettier"
+                  label="Prettier"
+                  class="mt-2"
+                  disabled
+                ></v-switch>
+              </v-toolbar>
+            </template>
+            <template v-slot:item.level="{ item }">
+              <v-chip x-small :color="getLogColor(item.level)" dark>
+                {{ item.level }}</v-chip
               >
-                <template v-slot:item.level="{ item }">
-                  <v-chip x-small :color="getLogColor(item.level)" dark>
-                    {{ item.level }}</v-chip
-                  >
-                </template>
-              </v-data-table>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-
+            </template>
+          </v-data-table>
+        </v-card>
         <v-card
           v-for="item in onlineVariants"
           :key="item.varName"
@@ -80,96 +64,89 @@
         </v-card>
       </v-col>
     </v-row>
-
-    <v-btn :color="connected ? 'pink' : 'green'" dark fixed bottom right fab>
-      <v-icon v-if="connected" @click="disconnect">mdi-logout</v-icon>
-      <v-icon v-else @click="connect">mdi-login</v-icon>
-    </v-btn>
   </v-container>
 </template>
 
 <script>
-import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import Plot from "@/components/Plot";
-import { getToken } from "@/utils/auth";
-
+import { mapGetters } from "vuex";
 export default {
   components: {
     Plot
   },
+  props: {
+    logId: {
+      type: String,
+      default: () => null
+    }
+  },
   data() {
     return {
       fab: false,
-      connection: null,
       onlineVariants: [],
-      logList: [],
-      panelStatus: [],
+      prettier: true,
+      logs: [],
       logTableHeader: [
         {
           text: "Time",
           value: "time",
-          sort: (lhs, rhs) => Date.parse(rhs) - Date.parse(lhs),
-          width: "15%"
+          width: "20%"
         },
-        { text: "Thread Id", value: "threadId", width: "10%" },
+        { text: "Thread", value: "threadId", width: "10%" },
         { text: "Level", value: "level", width: "10%" },
         { text: "Content", value: "content" }
-      ]
+      ],
+      loading: false
     };
   },
   computed: {
+    ...mapGetters("log", ["connection", "connectionStatus"]),
     connected() {
       try {
         return this.connection.connectionState === "Connected";
       } catch (e) {
         return false;
       }
+    },
+    isEmptyId() {
+      return this.logId == "index" || this.logId == "";
     }
   },
   async created() {
-    if (!this.connection || this.connection.connectionState != "Connected") {
-      this.connection = new HubConnectionBuilder()
-        .withUrl("/log-viewer", { accessTokenFactory: () => getToken() })
-        .configureLogging(LogLevel.Information)
-        .build();
-      this.connection.on("RefreshLogsList", logList => {
-        this.logList = logList;
-      });
-      this.connection.on("ReceiveLog", (logId, logs) => {
-        console.log(logId)
-        let logItem = this.logList.find(item => item.id === logId);
-        if (logItem) {
-          logItem.logs.push(...logs);
-        }
-      });
-      await this.connection.start();
+    if (this.isEmptyId) {
+      return;
     }
-    this.logList = (await this.connection.invoke("ListLogs")).map(item => {
-      return {
-        ...item,
-        log: [],
-        loading: false
-      };
+    if (!this.connectionStatus) {
+      await this.$store.dispatch("log/connect");
+    }
+    this.connection.on("ReceiveLog", (logId, logs) => {
+      if (this.logId === logId) {
+        logs = logs.sort(
+          (lhs, rhs) => Date.parse(rhs.time) - Date.parse(lhs.time)
+        );
+        this.logs.splice(0, 0, ...logs);
+      }
     });
-    console.log(this.logList);
+    this.loading = true;
+    this.connection.invoke("ListenLog", this.logId);
+    this.connection.invoke("GetLog", this.logId).then(res => {
+      res.log = res.log.sort(
+        (lhs, rhs) => Date.parse(rhs.time) - Date.parse(lhs.time)
+      );
+      this.logs.push(...res.log);
+      this.loading = false;
+    });
+  },
+  async destroyed() {
+    if (this.connectionStatus) {
+      await this.connection.invoke("UnListenLog", this.logId);
+      this.logs = [];
+    }
   },
   methods: {
     handlePanelChange(index) {
       if (this.panelStatus.find(item => item == index) == undefined) {
-        console.log("open");
         // panel open
-        this.logList[index].loading = true;
-        this.connection.invoke("ListenLog", this.logList[index].id);
-        this.connection.invoke("GetLog", this.logList[index].id).then(res => {
-          this.logList[index].log.splice(0, 0, ...res.log);
-          console.log(this.logList[index].log);
-          this.logList[index].loading = false;
-        });
-      } else {
-        console.log("close");
-        // panel close
-        this.connection.invoke("UnListenLog", this.logList[index].id);
-        this.logList[index].log = [];
       }
     },
     getLogColor(level) {

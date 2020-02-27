@@ -3,7 +3,6 @@
     <v-content>
       <v-container
         class="fill-height"
-
       >
         <v-row
           align="center"
@@ -68,7 +67,7 @@ export default {
   },
   methods: {
     onLogin() {
-      this.$store.dispatch('login', this.loginForm)
+      this.$store.dispatch('user/login', this.loginForm)
         .then(() => {
           this.$router.push({path: '/'})
         })

@@ -31,7 +31,7 @@ service.interceptors.response.use(
   error => {
     if (error.status === 401) {
       // to re-login
-        store.dispatch('resetToken').then(() => {
+        store.dispatch('user/resetToken').then(() => {
           location.reload()
         })
       return Promise.reject(error)

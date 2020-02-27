@@ -46,7 +46,7 @@ namespace Logger.Hubs
 
         public async Task AddLog(string logId, IEnumerable<string> logs)
         {
-            var records = _logService.AddRecord(logId, logs);
+            var records = await _logService.AddRecord(logId, logs);
             await _logViewerHub.Clients.Group("Listen" + logId).SendAsync("ReceiveLog", logId, records);
         }
 

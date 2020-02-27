@@ -94,6 +94,7 @@ int main()
 	spdlog::set_default_logger(console);
 	spdlog::set_pattern("[%T.%e] [%-5t] %^[%l]%$  %v");
 	spdlog::set_level(spdlog::level::info);
+	spdlog::flush_on(spdlog::level::trace);
 	spdlog::flush_every(std::chrono::seconds(1));
 	
 	auto onlineLogger = std::make_shared<spdlog::logger>(
@@ -103,11 +104,12 @@ int main()
 	spdlog::register_logger(onlineLogger);
 
 	std::default_random_engine random(std::time(nullptr));
-
+	onlineLogger->flush_on(spdlog::level::trace);
 	while (true)
 	{
 		onlineLogger->log(static_cast<spdlog::level::level_enum>(random() % 6),
 						  "Hello world: {}", random());
+		
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 	return 0;

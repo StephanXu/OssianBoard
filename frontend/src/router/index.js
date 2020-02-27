@@ -1,50 +1,52 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import {getToken} from '@/utils/auth' // get token from cookie
+import {
+  getToken
+} from '@/utils/auth' // get token from cookie
 import Layout from '@/views/Layout'
 import store from '@/store'
 
 Vue.use(VueRouter)
 
-const routes = [
-  {
+const routes = [{
     path: '/',
     name: 'index',
     component: Layout,
     redirect: '/index',
-    children: [
-      {
-        path: '/index',
-        name: 'config',
-        component: () => import('@/views/config')
+    children: [{
+      path: '/index',
+      name: 'config',
+      component: () => import('@/views/config'),
+      meta: {
+        drawer: () => import('@/views/DefaultNavigator')
       }
-    ]
+    }]
   },
   {
     path: '/board',
     name: 'board',
     component: Layout,
     redirect: '/board/index',
-    children: [
-      {
-        path: 'index',
-        name: 'board',
-        component: () => import('@/views/OnlineLogger')
+    children: [{
+      path: ':logId',
+      name: 'board',
+      component: () => import('@/views/OnlineLogger'),
+      props: true,
+      meta: {
+        drawer: () => import('@/views/ClientChoose')
       }
-    ]
+    }]
   },
   {
     path: '/profile',
     name: 'profile',
     component: Layout,
     redirect: '/profile/index',
-    children: [
-      {
-        path: 'index',
-        name: 'profile',
-        component: () => import('@/views/Profile')
-      }
-    ]
+    children: [{
+      path: 'index',
+      name: 'profile',
+      component: () => import('@/views/Profile')
+    }]
   },
   {
     path: '/about',
@@ -70,9 +72,11 @@ router.beforeEach(async (to, from, next) => {
   if (hasToken) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
-      next({path: '/'})
+      next({
+        path: '/'
+      })
     } else {
-      await store.dispatch('getInfo')
+      await store.dispatch('user/getInfo')
       next()
     }
   } else {

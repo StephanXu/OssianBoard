@@ -69,7 +69,6 @@
 import {getArguments, setArguments, resetArguments} from "@/api/arguments";
 import protoRoot from "../proto/proto";
 import {createTable, createTableContentObject} from "../proto/parser";
-import {mapGetters} from 'vuex'
 
 export default {
   props: {
@@ -89,9 +88,6 @@ export default {
       visible: false
     }
   }),
-  computed: {
-    ...mapGetters['name', 'alias']
-  },
   methods: {
     onSubmit() {
       let configType = protoRoot.lookupType("Configuration");
