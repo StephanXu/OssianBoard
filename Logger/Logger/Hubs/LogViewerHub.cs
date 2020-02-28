@@ -23,6 +23,14 @@ namespace Logger.Hubs
 
         public async Task<LogModel> GetLog(string logId) => await _logService.GetLog(logId);
 
+        public async Task RemoveLog(string logId)
+        {
+            await _logService.RemoveLog(logId);
+            await Clients.All.SendAsync(
+                "RefreshLogsList",
+                _logService.ListLogs());
+        }
+
         public async Task ListenLog(string logId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "Listen" + logId);

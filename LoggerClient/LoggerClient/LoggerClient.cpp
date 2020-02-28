@@ -61,7 +61,7 @@ public:
 			   .build())
 	{
 		std::promise<void> waitTask;
-		m_Hub.Invoke("CreateLog", std::string("Untitled"), std::string("A log")).Then<std::string>(
+		m_Hub.Invoke("CreateLog", std::string("Ossian Client"), std::string("PID debugging")).Then<std::string>(
 			[&waitTask, this](const std::string& id, std::exception_ptr)
 			{
 				m_LogId = id;
@@ -94,8 +94,8 @@ int main()
 	spdlog::set_default_logger(console);
 	spdlog::set_pattern("[%T.%e] [%-5t] %^[%l]%$  %v");
 	spdlog::set_level(spdlog::level::info);
-	spdlog::flush_on(spdlog::level::trace);
-	spdlog::flush_every(std::chrono::seconds(1));
+	//spdlog::flush_on(spdlog::level::trace);
+	//spdlog::flush_every(std::chrono::seconds(1));
 	
 	auto onlineLogger = std::make_shared<spdlog::logger>(
 		"onlineLogger",
@@ -108,7 +108,7 @@ int main()
 	while (true)
 	{
 		onlineLogger->log(static_cast<spdlog::level::level_enum>(random() % 6),
-						  "Hello world: {}", random());
+						  "@Fig1=[$var1={},$var2={}]", random(), random());
 		
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}

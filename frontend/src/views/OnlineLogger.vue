@@ -30,36 +30,16 @@
             </template>
           </v-data-table>
         </v-card>
-        <v-card
-          v-for="item in onlineVariants"
-          :key="item.varName"
-          class="mx-auto"
-          style="margin-bottom: 20px;max-width: 850px"
-          color="grey lighten-4"
-          tle
-        >
-          <v-card-title>
-            <v-icon color="indigo" class="mr-12" size="64">
-              mdi-record-circle
-            </v-icon>
-            <v-row align="start">
-              <div class="caption grey--text text-uppercase">
-                {{ item.varName }}
-              </div>
-              <div>
-                <span
-                  class="display-2 font-weight-black black--text"
-                  v-text="item.dots[item.dots.length - 1] || '—'"
-                ></span>
-                <strong class="black--text">Currently</strong>
-              </div>
-            </v-row>
-          </v-card-title>
-          <!--          <v-card-title>{{item.varName}}</v-card-title>-->
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <v-card v-for="item in figures" :key="item.name" class="mx-auto" tle>
+          <v-card-title>{{ item.name }}</v-card-title>
           <plot
             style="height: 500px;width: 100%"
-            :dots="item.dots"
-            :times="item.times"
+            :values="item.variables"
+            :times="item.variables[0].times"
           ></plot>
         </v-card>
       </v-col>
@@ -84,6 +64,7 @@ export default {
     return {
       fab: false,
       onlineVariants: [],
+      figures: [],
       prettier: true,
       logs: [],
       logTableHeader: [
@@ -125,6 +106,9 @@ export default {
           (lhs, rhs) => Date.parse(rhs.time) - Date.parse(lhs.time)
         );
         this.logs.splice(0, 0, ...logs);
+        logs.forEach(element => {
+          this.parseLog(element);
+        });
       }
     });
     this.loading = true;
@@ -133,6 +117,9 @@ export default {
       res.log = res.log.sort(
         (lhs, rhs) => Date.parse(rhs.time) - Date.parse(lhs.time)
       );
+      res.log.forEach(element => {
+        this.parseLog(element);
+      });
       this.logs.push(...res.log);
       this.loading = false;
     });
@@ -144,9 +131,46 @@ export default {
     }
   },
   methods: {
-    handlePanelChange(index) {
-      if (this.panelStatus.find(item => item == index) == undefined) {
-        // panel open
+    parseLog(log) {
+      try {
+        let figureName = log.content.match(/@(\w+)/)[1];
+        let figureIndex = this.figures.findIndex(
+          item => item.name === figureName
+        );
+        if (figureIndex == -1) {
+          this.figures.push({
+            name: figureName,
+            variables: []
+          });
+          figureIndex = this.figures.length - 1;
+        }
+        const regexAssignPattern = /\$(?<varName>\w+)\s*=\s*(?<value>[0-9]*)/g;
+        let assignMatch = null;
+        while (
+          (assignMatch = regexAssignPattern.exec(
+            log.content.match(/\[(.*?)\]/)[1]
+          ))
+        ) {
+          let varIndex = this.figures[figureIndex].variables.findIndex(
+            item => item.varName === assignMatch.groups.varName
+          );
+          if (varIndex == -1) {
+            this.figures[figureIndex].variables.push({
+              varName: assignMatch.groups.varName,
+              times: [new Date(log.time)],
+              values: [Number(assignMatch.groups.value)]
+            });
+          } else {
+            this.figures[figureIndex].variables[varIndex].times.push(
+              new Date(log.time)
+            );
+            this.figures[figureIndex].variables[varIndex].values.push(
+              Number(assignMatch.groups.value)
+            );
+          }
+        }
+      } catch (err) {
+        return;
       }
     },
     getLogColor(level) {

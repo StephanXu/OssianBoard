@@ -18,7 +18,6 @@ const routes = [{
       name: 'config',
       component: () => import('@/views/config'),
       meta: {
-        drawer: () => import('@/views/DefaultNavigator')
       }
     }]
   },

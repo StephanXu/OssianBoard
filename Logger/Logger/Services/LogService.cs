@@ -18,6 +18,7 @@ namespace Logger.Services
         public Task<LogModel> CreateLog(string name, string description);
         public IEnumerable<LogListItem> ListLogs();
         public Task<IEnumerable<RecordModel>> AddRecord(string logId, IEnumerable<string> record);
+        public Task<LogModel> RemoveLog(string logId);
     }
 
     public class LogService : ILogService
@@ -65,7 +66,7 @@ namespace Logger.Services
             var records = record.Select(item =>
             {
                 var matches = Regex.Matches(item, @"\[.*?\]");
-                var matchesStr = 
+                var matchesStr =
                     matches.Select(item => item.ToString().Substring(1, item.Length - 2).Trim())
                     .ToList();
                 return new RecordModel
@@ -73,12 +74,15 @@ namespace Logger.Services
                     Time = DateTime.Parse(matchesStr[0]),
                     ThreadId = Int32.Parse(matchesStr[1]),
                     Level = matchesStr[2],
-                    Content = item.Substring(matches.Last().Index + matches.Last().Length + 1).TrimEnd()
+                    Content = item.Substring(matches[2].Index + matches[2].Length + 1).TrimEnd()
                 };
             });
             log.Log.AddRange(records);
             await _logCollection.ReplaceOneAsync(item => item.Id == logId, log);
             return records;
         }
+
+        public async Task<LogModel> RemoveLog(string logId) =>
+            await _logCollection.FindOneAndDeleteAsync(item => item.Id == logId);
     }
 }

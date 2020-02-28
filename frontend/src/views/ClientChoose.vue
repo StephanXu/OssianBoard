@@ -1,19 +1,6 @@
 <template>
   <v-navigation-drawer v-model="drawer" app clipped width="400px">
-    <v-list nav>
-      <v-list-item link>
-        <v-list-item-content>
-          <v-list-item-title class="title">
-            {{ alias }}
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            {{ name }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
-
-    <v-divider></v-divider>
+    <v-divider />
 
     <v-item-group>
       <v-container>
@@ -28,7 +15,13 @@
                 link
                 :to="`/board/${item.id}`"
               >
-                <v-card-title>{{ item.name }}</v-card-title>
+                <v-card-title>
+                  {{ item.name }}
+                  <v-spacer />
+                  <v-btn icon @click="handleDeleteLog(item.id)">
+                    <v-icon>delete</v-icon>
+                  </v-btn>
+                </v-card-title>
                 <v-card-subtitle>{{ item.description }}</v-card-subtitle>
                 <v-card-subtitle>{{ item.createTime }}</v-card-subtitle>
               </v-card>
@@ -37,12 +30,6 @@
         </v-row>
       </v-container>
     </v-item-group>
-
-    <template v-slot:append>
-      <div class="pa-2">
-        <v-btn block @click="logout">Logout</v-btn>
-      </div>
-    </template>
   </v-navigation-drawer>
 </template>
 
@@ -64,7 +51,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("user", ["name", "alias"]),
     ...mapGetters("log", ["connection", "connectionStatus"]),
     drawer: {
       get() {
@@ -109,6 +95,9 @@ export default {
     },
     switchPage(row) {
       this.$router.push({ path: row.redirect });
+    },
+    handleDeleteLog(logId) {
+      this.connection.invoke('RemoveLog',logId)
     }
   }
 };
