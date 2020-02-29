@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import Plot from "@/components/Plot";
+import Plot from "./components/Plot";
 import { mapGetters } from "vuex";
 export default {
   components: {

@@ -21,7 +21,7 @@
       />
 
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
-        <span class="title">Ossian Logger</span>
+        <span class="title">Ossian Board</span>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>

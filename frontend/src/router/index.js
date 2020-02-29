@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import {
   getToken
 } from '@/utils/auth' // get token from cookie
-import Layout from '@/views/Layout'
+import Layout from '@/views/layout/Layout'
 import store from '@/store'
 
 Vue.use(VueRouter)
@@ -16,8 +16,9 @@ const routes = [{
     children: [{
       path: '/index',
       name: 'config',
-      component: () => import('@/views/config'),
+      component: () => import('@/views/arguments/Arguments'),
       meta: {
+        title: 'Arguments'
       }
     }]
   },
@@ -29,10 +30,11 @@ const routes = [{
     children: [{
       path: ':logId',
       name: 'board',
-      component: () => import('@/views/OnlineLogger'),
+      component: () => import('@/views/onlineLogger/OnlineLogger'),
       props: true,
       meta: {
-        drawer: () => import('@/views/ClientChoose')
+        drawer: () => import('@/views/onlineLogger/ClientChoose'),
+        title: 'Online Logger'
       }
     }]
   },
@@ -44,18 +46,19 @@ const routes = [{
     children: [{
       path: 'index',
       name: 'profile',
-      component: () => import('@/views/Profile')
+      component: () => import('@/views/profile/Profile'),
+      meta: {
+        title: 'Profile'
+      }
     }]
-  },
-  {
-    path: '/about',
-    name: 'about',
-    component: () => import('../views/About.vue')
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import('../views/Login.vue')
+    component: () => import('../views/login/Login.vue'),
+    meta: {
+      title: 'Login'
+    }
   }
 ]
 
@@ -67,6 +70,8 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
   // determine whether the user has logged in
   const hasToken = getToken()
+
+  document.title = `${to.meta.title} - Ossian Board`
 
   if (hasToken) {
     if (to.path === '/login') {

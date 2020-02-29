@@ -67,8 +67,8 @@
 
 <script>
 import {getArguments, setArguments, resetArguments} from "@/api/arguments";
-import protoRoot from "../proto/proto";
-import {createTable, createTableContentObject} from "../proto/parser";
+import protoRoot from "@/proto/proto";
+import {createTable, createTableContentObject} from "@/proto/parser";
 
 export default {
   props: {
