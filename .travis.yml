@@ -11,9 +11,11 @@ branches:
 services:
   - docker
 
+script:
+  - docker-compose -f docker-compose.yml up -d --build
+
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin $DOCKER_REGISTRY
-  - docker-compose -f docker-compose.yml up -d --build
   - docker-compose -f docker-compose.yml push
   - scp -o "StrictHostKeyChecking no" docker-compose.yml ubuntu@ip:/root/ossian-board/
   - ssh -o "StrictHostKeyChecking no" root@mrxzh.com "cd /root/ossian-board/;docker-compose -f docker-compose.yml pull;docker-compose -f docker-compose.yml up -d;exit"
