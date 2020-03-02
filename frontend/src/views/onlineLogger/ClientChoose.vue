@@ -8,7 +8,12 @@
           <v-col cols="12">
             <v-item v-slot:default="{ active, toggle }">
               <v-card
-                :color="active ? '#e9f1fe' : ''"
+                :class="{
+                  grey: active && $vuetify.theme.dark,
+                  'darken-4': active && $vuetify.theme.dark,
+                  blue: active && !$vuetify.theme.dark,
+                  'lighten-4': active && !$vuetify.theme.dark
+                }"
                 @click="toggle"
                 outlined
                 :hover="!active"
@@ -97,7 +102,18 @@ export default {
       this.$router.push({ path: row.redirect });
     },
     handleDeleteLog(logId) {
-      this.connection.invoke('RemoveLog',logId)
+      this.connection.invoke("RemoveLog", logId);
+    },
+    listItemClass(active) {
+      console.log(this.$vuetify.theme.dark);
+      let a = {
+        gray: active && this.$vuetify.theme.dark,
+        "darken-4": active && this.$vuetify.theme.dark,
+        blue: active && !this.$vuetify.theme.dark,
+        "lighten-4": active && !this.$vuetify.theme.dark
+      };
+      console.log(a);
+      return a;
     }
   }
 };

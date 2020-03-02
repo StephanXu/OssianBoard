@@ -105,7 +105,7 @@ namespace Logger.Services
                                     ""PIDChassisAngle_Th_Out"": 6,
                                     ""PIDChassisAngle_Th_IOut"": 0.2,
 
-                                    ""TOP_WZ"": 3
+                                    ""Top_Wz"": 3
                                 }
                             }"
             });
