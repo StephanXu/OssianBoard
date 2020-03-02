@@ -1,0 +1,15 @@
+version: "3"
+services:
+    db:
+        image: mongo:4.0-bionic
+        ports:
+            - "37017:27017"
+        restart: always
+    static:
+        image: registry.cn-hangzhou.aliyuncs.com/ossian/ossian-board-static
+        ports:
+            - "4000:80"
+        restart: always
+    backend:
+        image: registry.cn-hangzhou.aliyuncs.com/ossian/ossian-board-backend
+        restart: always
