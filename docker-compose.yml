@@ -6,10 +6,12 @@ services:
             - "37017:27017"
         restart: always
     static:
+        image: registry.cn-hangzhou.aliyuncs.com/ossian/ossian-board-static
         build: ./frontend/
         ports:
             - "4000:80"
         restart: always
     backend:
+        image: registry.cn-hangzhou.aliyuncs.com/ossian/ossian-board-backend
         build: ./Logger/
         restart: always
