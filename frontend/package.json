@@ -1,5 +1,5 @@
 {
-  "name": "nautilus-vision-config-generator",
+  "name": "ossian-board",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,7 +14,10 @@
     "core-js": "^3.4.4",
     "echarts": "^4.6.0",
     "element-ui": "^2.13.0",
+    "escodegen": "^1.14.1",
+    "espree": "^3.5.4",
     "js-cookie": "^2.2.1",
+    "jsdoc": "^3.6.3",
     "protobufjs": "^6.8.8",
     "vue": "^2.6.10",
     "vue-echarts": "^5.0.0-beta.0",

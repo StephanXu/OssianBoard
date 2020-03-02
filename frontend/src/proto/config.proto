@@ -2,23 +2,23 @@
 syntax = "proto3";
 //option optimize_for = LITE_RUNTIME;
 
-package NautilusVisionConfig;
+package OssianConfig;
 
 message SerialPort {
 	string portName = 1;
 	int32 baudrate = 2;
 	enum Parity {
-		NoParity = 0; // Êó†Ê†°È™å
-		OddParity = 1; // Â•áÊ†°È™å
-		EvenParity = 2; // ÂÅ∂Ê†°È™å
-		MarkParity = 3; // Ê†áËÆ∞Ê†°È™å
+		NoParity = 0; // Œﬁ–£—È
+		OddParity = 1; // ∆Ê–£—È
+		EvenParity = 2; // ≈º–£—È
+		MarkParity = 3; // ±Íº«–£—È
 	}
 	Parity parity = 3;
 	int32 dataBit = 4;
 	enum StopBit {
-		OneStopBit = 0; // 1‰ΩçÂÅúÊ≠¢‰Ωç
-		One5StopBits = 1; // 1.5‰ΩçÂÅúÊ≠¢‰Ωç
-		TwoStopBits = 2; // 2‰ΩçÂÅúÊ≠¢‰Ωç
+		OneStopBit = 0; // 1ŒªÕ£÷πŒª
+		One5StopBits = 1; // 1.5ŒªÕ£÷πŒª
+		TwoStopBits = 2; // 2ŒªÕ£÷πŒª
 	}
 	StopBit stopBit = 5;
 	bool synchronize = 6;
@@ -36,47 +36,60 @@ message TestVideoSource {
 }
 
 message Aimbot {
-	float maxShootRadius = 1;
 	enum EnemyColor {
-		Red = 0; // Á∫¢Ëâ≤Êïå‰∫∫
-		Blue = 1; // ËìùËâ≤Êïå‰∫∫
+		Red = 0; // ∫Ï…´µ–»À
+		Blue = 2; // ¿∂…´µ–»À
 	}
-	EnemyColor enemyColor = 2;
+	EnemyColor enemyColor = 1;
 
-	int32 brightness = 3;
-	int32 thresColor = 4;
+	int32 brightness = 2;
+	int32 thresColor = 3;
 
-	float lightBarMinArea = 5;
-	float lightBarContourMinSolidity = 6;
-	float lightBarEllipseMinAspectRatio = 7;
+	double lightBarMinArea = 4;
+	double lightBarContourMinSolidity = 5;
+	double lightBarEllipseMinAspectRatio = 6;
 
-	float armorMaxAngleDiff = 8;
-	float armorMaxHeightDiffRatio = 9;
-	float armorMaxYDiffRatio = 10;
-	float armorMinXDiffRatio = 11;
-	float armorBigArmorRatio = 12;
-	float armorSmallArmorRatio = 13;
-	float armorMinAspectRatio = 14;
-	float armorMaxAspectRatio = 15;
+	double armorMaxAngleDiff = 7;
+	double armorMaxHeightDiffRatio = 8;
+	double armorMaxYDiffRatio = 9;
+	double armorMinXDiffRatio = 10;
+	double armorBigArmorRatio = 11;
+	double armorSmallArmorRatio = 12;
+	double armorMinAspectRatio = 13;
+	double armorMaxAspectRatio = 14;
 
-	float areaNormalizedBase = 16;
-	float sightOffsetNormalizedBase = 17;
+	double areaNormalizedBase = 15;
+	double sightOffsetNormalizedBase = 16;
 }
 
 message PoseSolver {
-	float offsetX = 1;
-	float offsetZPitch = 2;
-	float offsetYPitch = 3;
-	float offsetYYaw = 4;
-	float offsetZYaw = 5;
+	double cameraToGimbalX = 1;
+	double cameraToGimbalY = 2;
+	double cameraToGimbalZ = 3;
+	double barrelToGimbalY = 4;
+	double rotOverlapLen = 5;
 
-	float offsetYaw = 6;
-	float offsetPitch = 7;
-
-	float initV = 8;
-	float initK = 9;
-	float gravity = 10;
+	double initV = 6;
+	double initK = 7;
+	double gravity = 8;
+	double scaleDist = 9;
 }
+
+message Chassis {  
+	double PIDWheelSpeed_Kp = 1;
+	double PIDWheelSpeed_Ki = 2;
+	double PIDWheelSpeed_Kd = 3;
+	double PIDWheelSpeed_Th_Out = 4;
+	double PIDWheelSpeed_Th_IOut = 5;
+
+	double PIDChassisAngle_Kp = 6;
+	double PIDChassisAngle_Ki = 7;
+	double PIDChassisAngle_Kd = 8;
+	double PIDChassisAngle_Th_Out = 9;
+	double PIDChassisAngle_Th_IOut = 10;
+
+	double Top_Wz = 11;
+} 
 
 message Configuration {
 	SerialPort serialPort = 1;
@@ -84,4 +97,6 @@ message Configuration {
 	TestVideoSource testVideoSource = 3;
 	Aimbot aimbot = 4;
 	PoseSolver poseSolver = 5;
+	Chassis chassis = 6;
 }
+

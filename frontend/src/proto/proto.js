@@ -5,7 +5,7 @@ var $protobuf = require("protobufjs/light");
 
 var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $protobuf.Root()))
 .addJSON({
-  NautilusVisionConfig: {
+  OssianConfig: {
     nested: {
       SerialPort: {
         fields: {
@@ -82,125 +82,165 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       },
       Aimbot: {
         fields: {
-          maxShootRadius: {
-            type: "float",
-            id: 1
-          },
           enemyColor: {
             type: "EnemyColor",
-            id: 2
+            id: 1
           },
           brightness: {
             type: "int32",
-            id: 3
+            id: 2
           },
           thresColor: {
             type: "int32",
-            id: 4
+            id: 3
           },
           lightBarMinArea: {
-            type: "float",
-            id: 5
+            type: "double",
+            id: 4
           },
           lightBarContourMinSolidity: {
-            type: "float",
-            id: 6
+            type: "double",
+            id: 5
           },
           lightBarEllipseMinAspectRatio: {
-            type: "float",
-            id: 7
+            type: "double",
+            id: 6
           },
           armorMaxAngleDiff: {
-            type: "float",
-            id: 8
+            type: "double",
+            id: 7
           },
           armorMaxHeightDiffRatio: {
-            type: "float",
-            id: 9
+            type: "double",
+            id: 8
           },
           armorMaxYDiffRatio: {
-            type: "float",
-            id: 10
+            type: "double",
+            id: 9
           },
           armorMinXDiffRatio: {
-            type: "float",
-            id: 11
+            type: "double",
+            id: 10
           },
           armorBigArmorRatio: {
-            type: "float",
-            id: 12
+            type: "double",
+            id: 11
           },
           armorSmallArmorRatio: {
-            type: "float",
-            id: 13
+            type: "double",
+            id: 12
           },
           armorMinAspectRatio: {
-            type: "float",
-            id: 14
+            type: "double",
+            id: 13
           },
           armorMaxAspectRatio: {
-            type: "float",
-            id: 15
+            type: "double",
+            id: 14
           },
           areaNormalizedBase: {
-            type: "float",
-            id: 16
+            type: "double",
+            id: 15
           },
           sightOffsetNormalizedBase: {
-            type: "float",
-            id: 17
+            type: "double",
+            id: 16
           }
         },
         nested: {
           EnemyColor: {
             values: {
               Red: 0,
-              Blue: 1
+              Blue: 2
             }
           }
         }
       },
       PoseSolver: {
         fields: {
-          offsetX: {
-            type: "float",
+          cameraToGimbalX: {
+            type: "double",
             id: 1
           },
-          offsetZPitch: {
-            type: "float",
+          cameraToGimbalY: {
+            type: "double",
             id: 2
           },
-          offsetYPitch: {
-            type: "float",
+          cameraToGimbalZ: {
+            type: "double",
             id: 3
           },
-          offsetYYaw: {
-            type: "float",
+          barrelToGimbalY: {
+            type: "double",
             id: 4
           },
-          offsetZYaw: {
-            type: "float",
+          rotOverlapLen: {
+            type: "double",
             id: 5
           },
-          offsetYaw: {
-            type: "float",
+          initV: {
+            type: "double",
             id: 6
           },
-          offsetPitch: {
-            type: "float",
+          initK: {
+            type: "double",
             id: 7
           },
-          initV: {
-            type: "float",
+          gravity: {
+            type: "double",
             id: 8
           },
-          initK: {
-            type: "float",
+          scaleDist: {
+            type: "double",
+            id: 9
+          }
+        }
+      },
+      Chassis: {
+        fields: {
+          PIDWheelSpeed_Kp: {
+            type: "double",
+            id: 1
+          },
+          PIDWheelSpeed_Ki: {
+            type: "double",
+            id: 2
+          },
+          PIDWheelSpeed_Kd: {
+            type: "double",
+            id: 3
+          },
+          PIDWheelSpeed_Th_Out: {
+            type: "double",
+            id: 4
+          },
+          PIDWheelSpeed_Th_IOut: {
+            type: "double",
+            id: 5
+          },
+          PIDChassisAngle_Kp: {
+            type: "double",
+            id: 6
+          },
+          PIDChassisAngle_Ki: {
+            type: "double",
+            id: 7
+          },
+          PIDChassisAngle_Kd: {
+            type: "double",
+            id: 8
+          },
+          PIDChassisAngle_Th_Out: {
+            type: "double",
             id: 9
           },
-          gravity: {
-            type: "float",
+          PIDChassisAngle_Th_IOut: {
+            type: "double",
             id: 10
+          },
+          Top_Wz: {
+            type: "double",
+            id: 11
           }
         }
       },
@@ -225,6 +265,10 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
           poseSolver: {
             type: "PoseSolver",
             id: 5
+          },
+          chassis: {
+            type: "Chassis",
+            id: 6
           }
         }
       }
