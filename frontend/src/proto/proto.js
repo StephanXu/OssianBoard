@@ -198,49 +198,288 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       },
       Chassis: {
         fields: {
-          PIDWheelSpeed_Kp: {
+          kTopWz: {
+            type: "double",
+            id: 1
+          }
+        }
+      },
+      Gimbal: {
+        fields: {}
+      },
+      Gun: {
+        fields: {
+          kFricSpeed12: {
+            type: "int32",
+            id: 1
+          },
+          kFricSpeed15: {
+            type: "int32",
+            id: 2
+          },
+          kFricSpeed18: {
+            type: "int32",
+            id: 3
+          },
+          kFricSpeed30: {
+            type: "int32",
+            id: 4
+          },
+          kFeedNormalRPM: {
+            type: "int32",
+            id: 5
+          },
+          kFeedSemiRPM: {
+            type: "int32",
+            id: 6
+          },
+          kFeedBurstRPM: {
+            type: "int32",
+            id: 7
+          },
+          kFeedAutoRPM: {
+            type: "int32",
+            id: 8
+          }
+        }
+      },
+      PIDWheelSpeed: {
+        fields: {
+          kP: {
             type: "double",
             id: 1
           },
-          PIDWheelSpeed_Ki: {
+          kI: {
             type: "double",
             id: 2
           },
-          PIDWheelSpeed_Kd: {
+          kD: {
             type: "double",
             id: 3
           },
-          PIDWheelSpeed_Th_Out: {
+          thOut: {
             type: "double",
             id: 4
           },
-          PIDWheelSpeed_Th_IOut: {
+          thIOut: {
             type: "double",
             id: 5
-          },
-          PIDChassisAngle_Kp: {
+          }
+        }
+      },
+      PIDChassisAngle: {
+        fields: {
+          kP: {
             type: "double",
-            id: 6
+            id: 1
           },
-          PIDChassisAngle_Ki: {
+          kI: {
             type: "double",
-            id: 7
+            id: 2
           },
-          PIDChassisAngle_Kd: {
+          kD: {
             type: "double",
-            id: 8
+            id: 3
           },
-          PIDChassisAngle_Th_Out: {
+          thOut: {
             type: "double",
-            id: 9
+            id: 4
           },
-          PIDChassisAngle_Th_IOut: {
+          thIOut: {
             type: "double",
-            id: 10
+            id: 5
+          }
+        }
+      },
+      PIDAngleEcdPitch: {
+        fields: {
+          kP: {
+            type: "double",
+            id: 1
           },
-          Top_Wz: {
+          kI: {
             type: "double",
-            id: 11
+            id: 2
+          },
+          kD: {
+            type: "double",
+            id: 3
+          },
+          thOut: {
+            type: "double",
+            id: 4
+          },
+          thIOut: {
+            type: "double",
+            id: 5
+          }
+        }
+      },
+      PIDAngleEcdYaw: {
+        fields: {
+          kP: {
+            type: "double",
+            id: 1
+          },
+          kI: {
+            type: "double",
+            id: 2
+          },
+          kD: {
+            type: "double",
+            id: 3
+          },
+          thOut: {
+            type: "double",
+            id: 4
+          },
+          thIOut: {
+            type: "double",
+            id: 5
+          }
+        }
+      },
+      PIDAngleGyroPitch: {
+        fields: {
+          kP: {
+            type: "double",
+            id: 1
+          },
+          kI: {
+            type: "double",
+            id: 2
+          },
+          kD: {
+            type: "double",
+            id: 3
+          },
+          thOut: {
+            type: "double",
+            id: 4
+          },
+          thIOut: {
+            type: "double",
+            id: 5
+          }
+        }
+      },
+      PIDAngleGyroYaw: {
+        fields: {
+          kP: {
+            type: "double",
+            id: 1
+          },
+          kI: {
+            type: "double",
+            id: 2
+          },
+          kD: {
+            type: "double",
+            id: 3
+          },
+          thOut: {
+            type: "double",
+            id: 4
+          },
+          thIOut: {
+            type: "double",
+            id: 5
+          }
+        }
+      },
+      PIDAngleSpeedPitch: {
+        fields: {
+          kP: {
+            type: "double",
+            id: 1
+          },
+          kI: {
+            type: "double",
+            id: 2
+          },
+          kD: {
+            type: "double",
+            id: 3
+          },
+          thOut: {
+            type: "double",
+            id: 4
+          },
+          thIOut: {
+            type: "double",
+            id: 5
+          }
+        }
+      },
+      PIDAngleSpeedYaw: {
+        fields: {
+          kP: {
+            type: "double",
+            id: 1
+          },
+          kI: {
+            type: "double",
+            id: 2
+          },
+          kD: {
+            type: "double",
+            id: 3
+          },
+          thOut: {
+            type: "double",
+            id: 4
+          },
+          thIOut: {
+            type: "double",
+            id: 5
+          }
+        }
+      },
+      PIDFricSpeed: {
+        fields: {
+          kP: {
+            type: "double",
+            id: 1
+          },
+          kI: {
+            type: "double",
+            id: 2
+          },
+          kD: {
+            type: "double",
+            id: 3
+          },
+          thOut: {
+            type: "double",
+            id: 4
+          },
+          thIOut: {
+            type: "double",
+            id: 5
+          }
+        }
+      },
+      PIDFeedSpeed: {
+        fields: {
+          kP: {
+            type: "double",
+            id: 1
+          },
+          kI: {
+            type: "double",
+            id: 2
+          },
+          kD: {
+            type: "double",
+            id: 3
+          },
+          thOut: {
+            type: "double",
+            id: 4
+          },
+          thIOut: {
+            type: "double",
+            id: 5
           }
         }
       },
@@ -269,6 +508,54 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
           chassis: {
             type: "Chassis",
             id: 6
+          },
+          gimbal: {
+            type: "Gimbal",
+            id: 7
+          },
+          gun: {
+            type: "Gun",
+            id: 8
+          },
+          pidWheelSpeed: {
+            type: "PIDWheelSpeed",
+            id: 9
+          },
+          pidChassisAngle: {
+            type: "PIDChassisAngle",
+            id: 10
+          },
+          pidAngleEcdPitch: {
+            type: "PIDAngleEcdPitch",
+            id: 11
+          },
+          pidAngleGyroPitch: {
+            type: "PIDAngleGyroPitch",
+            id: 12
+          },
+          pidAngleSpeedPitch: {
+            type: "PIDAngleSpeedPitch",
+            id: 13
+          },
+          pidAngleEcdYaw: {
+            type: "PIDAngleEcdYaw",
+            id: 14
+          },
+          pidAngleGyroYaw: {
+            type: "PIDAngleGyroYaw",
+            id: 15
+          },
+          pidAngleSpeedYaw: {
+            type: "PIDAngleSpeedYaw",
+            id: 16
+          },
+          pidFricSpeed: {
+            type: "PIDFricSpeed",
+            id: 17
+          },
+          pidFeedSpeed: {
+            type: "PIDFeedSpeed",
+            id: 18
           }
         }
       }
