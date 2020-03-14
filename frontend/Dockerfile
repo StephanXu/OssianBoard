@@ -3,6 +3,7 @@ WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
 RUN npm install --silent --registry=https://registry.npm.taobao.org
 COPY ./ .
+RUN npm run proto
 RUN npm run build
 
 FROM nginx:1.17.8-alpine AS final
