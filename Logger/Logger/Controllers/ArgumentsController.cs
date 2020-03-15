@@ -34,13 +34,5 @@ namespace Logger.Controllers
             _loggerHub.Clients.All.SendAsync("ReloadSettings", setting);
             return NoContent();
         }
-
-        [HttpPost]
-        [Route("reset")]
-        public ActionResult ResetSettings()
-        {
-            _siteSetting.Init();
-            return NoContent();
-        }
     }
 }

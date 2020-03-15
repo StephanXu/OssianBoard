@@ -10,30 +10,37 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       SerialPort: {
         fields: {
           portName: {
+            rule: "required",
             type: "string",
             id: 1
           },
           baudrate: {
+            rule: "required",
             type: "int32",
             id: 2
           },
           parity: {
+            rule: "required",
             type: "Parity",
             id: 3
           },
           dataBit: {
+            rule: "required",
             type: "int32",
             id: 4
           },
           stopBit: {
+            rule: "required",
             type: "StopBit",
             id: 5
           },
           synchronize: {
+            rule: "required",
             type: "bool",
             id: 6
           },
           syncInterval: {
+            rule: "required",
             type: "int32",
             id: 7
           }
@@ -59,14 +66,17 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       Camera: {
         fields: {
           deviceIndex: {
+            rule: "required",
             type: "int32",
             id: 1
           },
           frameWidth: {
+            rule: "required",
             type: "int32",
             id: 2
           },
           frameHeight: {
+            rule: "required",
             type: "int32",
             id: 3
           }
@@ -75,6 +85,7 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       TestVideoSource: {
         fields: {
           filename: {
+            rule: "required",
             type: "string",
             id: 1
           }
@@ -83,66 +94,82 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       Aimbot: {
         fields: {
           enemyColor: {
+            rule: "required",
             type: "EnemyColor",
             id: 1
           },
           brightness: {
+            rule: "required",
             type: "int32",
             id: 2
           },
           thresColor: {
+            rule: "required",
             type: "int32",
             id: 3
           },
           lightBarMinArea: {
+            rule: "required",
             type: "double",
             id: 4
           },
           lightBarContourMinSolidity: {
+            rule: "required",
             type: "double",
             id: 5
           },
           lightBarEllipseMinAspectRatio: {
+            rule: "required",
             type: "double",
             id: 6
           },
           armorMaxAngleDiff: {
+            rule: "required",
             type: "double",
             id: 7
           },
           armorMaxHeightDiffRatio: {
+            rule: "required",
             type: "double",
             id: 8
           },
           armorMaxYDiffRatio: {
+            rule: "required",
             type: "double",
             id: 9
           },
           armorMinXDiffRatio: {
+            rule: "required",
             type: "double",
             id: 10
           },
           armorBigArmorRatio: {
+            rule: "required",
             type: "double",
             id: 11
           },
           armorSmallArmorRatio: {
+            rule: "required",
             type: "double",
             id: 12
           },
           armorMinAspectRatio: {
+            rule: "required",
             type: "double",
             id: 13
           },
           armorMaxAspectRatio: {
+            rule: "required",
             type: "double",
             id: 14
           },
           areaNormalizedBase: {
+            rule: "required",
             type: "double",
             id: 15
           },
           sightOffsetNormalizedBase: {
+            rule: "required",
             type: "double",
             id: 16
           }
@@ -159,38 +186,47 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       PoseSolver: {
         fields: {
           cameraToGimbalX: {
+            rule: "required",
             type: "double",
             id: 1
           },
           cameraToGimbalY: {
+            rule: "required",
             type: "double",
             id: 2
           },
           cameraToGimbalZ: {
+            rule: "required",
             type: "double",
             id: 3
           },
           barrelToGimbalY: {
+            rule: "required",
             type: "double",
             id: 4
           },
           rotOverlapLen: {
+            rule: "required",
             type: "double",
             id: 5
           },
           initV: {
+            rule: "required",
             type: "double",
             id: 6
           },
           initK: {
+            rule: "required",
             type: "double",
             id: 7
           },
           gravity: {
+            rule: "required",
             type: "double",
             id: 8
           },
           scaleDist: {
+            rule: "required",
             type: "double",
             id: 9
           }
@@ -199,6 +235,7 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       Chassis: {
         fields: {
           kTopWz: {
+            rule: "required",
             type: "double",
             id: 1
           }
@@ -210,274 +247,71 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       Gun: {
         fields: {
           kFricSpeed12: {
+            rule: "required",
             type: "int32",
             id: 1
           },
           kFricSpeed15: {
+            rule: "required",
             type: "int32",
             id: 2
           },
           kFricSpeed18: {
+            rule: "required",
             type: "int32",
             id: 3
           },
           kFricSpeed30: {
+            rule: "required",
             type: "int32",
             id: 4
           },
           kFeedNormalRPM: {
+            rule: "required",
             type: "int32",
             id: 5
           },
           kFeedSemiRPM: {
+            rule: "required",
             type: "int32",
             id: 6
           },
           kFeedBurstRPM: {
+            rule: "required",
             type: "int32",
             id: 7
           },
           kFeedAutoRPM: {
+            rule: "required",
             type: "int32",
             id: 8
           }
         }
       },
-      PIDWheelSpeed: {
+      PIDParams: {
         fields: {
           kP: {
+            rule: "required",
             type: "double",
             id: 1
           },
           kI: {
+            rule: "required",
             type: "double",
             id: 2
           },
           kD: {
+            rule: "required",
             type: "double",
             id: 3
           },
           thOut: {
+            rule: "required",
             type: "double",
             id: 4
           },
           thIOut: {
-            type: "double",
-            id: 5
-          }
-        }
-      },
-      PIDChassisAngle: {
-        fields: {
-          kP: {
-            type: "double",
-            id: 1
-          },
-          kI: {
-            type: "double",
-            id: 2
-          },
-          kD: {
-            type: "double",
-            id: 3
-          },
-          thOut: {
-            type: "double",
-            id: 4
-          },
-          thIOut: {
-            type: "double",
-            id: 5
-          }
-        }
-      },
-      PIDAngleEcdPitch: {
-        fields: {
-          kP: {
-            type: "double",
-            id: 1
-          },
-          kI: {
-            type: "double",
-            id: 2
-          },
-          kD: {
-            type: "double",
-            id: 3
-          },
-          thOut: {
-            type: "double",
-            id: 4
-          },
-          thIOut: {
-            type: "double",
-            id: 5
-          }
-        }
-      },
-      PIDAngleEcdYaw: {
-        fields: {
-          kP: {
-            type: "double",
-            id: 1
-          },
-          kI: {
-            type: "double",
-            id: 2
-          },
-          kD: {
-            type: "double",
-            id: 3
-          },
-          thOut: {
-            type: "double",
-            id: 4
-          },
-          thIOut: {
-            type: "double",
-            id: 5
-          }
-        }
-      },
-      PIDAngleGyroPitch: {
-        fields: {
-          kP: {
-            type: "double",
-            id: 1
-          },
-          kI: {
-            type: "double",
-            id: 2
-          },
-          kD: {
-            type: "double",
-            id: 3
-          },
-          thOut: {
-            type: "double",
-            id: 4
-          },
-          thIOut: {
-            type: "double",
-            id: 5
-          }
-        }
-      },
-      PIDAngleGyroYaw: {
-        fields: {
-          kP: {
-            type: "double",
-            id: 1
-          },
-          kI: {
-            type: "double",
-            id: 2
-          },
-          kD: {
-            type: "double",
-            id: 3
-          },
-          thOut: {
-            type: "double",
-            id: 4
-          },
-          thIOut: {
-            type: "double",
-            id: 5
-          }
-        }
-      },
-      PIDAngleSpeedPitch: {
-        fields: {
-          kP: {
-            type: "double",
-            id: 1
-          },
-          kI: {
-            type: "double",
-            id: 2
-          },
-          kD: {
-            type: "double",
-            id: 3
-          },
-          thOut: {
-            type: "double",
-            id: 4
-          },
-          thIOut: {
-            type: "double",
-            id: 5
-          }
-        }
-      },
-      PIDAngleSpeedYaw: {
-        fields: {
-          kP: {
-            type: "double",
-            id: 1
-          },
-          kI: {
-            type: "double",
-            id: 2
-          },
-          kD: {
-            type: "double",
-            id: 3
-          },
-          thOut: {
-            type: "double",
-            id: 4
-          },
-          thIOut: {
-            type: "double",
-            id: 5
-          }
-        }
-      },
-      PIDFricSpeed: {
-        fields: {
-          kP: {
-            type: "double",
-            id: 1
-          },
-          kI: {
-            type: "double",
-            id: 2
-          },
-          kD: {
-            type: "double",
-            id: 3
-          },
-          thOut: {
-            type: "double",
-            id: 4
-          },
-          thIOut: {
-            type: "double",
-            id: 5
-          }
-        }
-      },
-      PIDFeedSpeed: {
-        fields: {
-          kP: {
-            type: "double",
-            id: 1
-          },
-          kI: {
-            type: "double",
-            id: 2
-          },
-          kD: {
-            type: "double",
-            id: 3
-          },
-          thOut: {
-            type: "double",
-            id: 4
-          },
-          thIOut: {
+            rule: "required",
             type: "double",
             id: 5
           }
@@ -486,75 +320,93 @@ var $root = ($protobuf.roots["default"] || ($protobuf.roots["default"] = new $pr
       Configuration: {
         fields: {
           serialPort: {
+            rule: "required",
             type: "SerialPort",
             id: 1
           },
           camera: {
+            rule: "required",
             type: "Camera",
             id: 2
           },
           testVideoSource: {
+            rule: "required",
             type: "TestVideoSource",
             id: 3
           },
           aimbot: {
+            rule: "required",
             type: "Aimbot",
             id: 4
           },
           poseSolver: {
+            rule: "required",
             type: "PoseSolver",
             id: 5
           },
           chassis: {
+            rule: "required",
             type: "Chassis",
             id: 6
           },
           gimbal: {
+            rule: "required",
             type: "Gimbal",
             id: 7
           },
           gun: {
+            rule: "required",
             type: "Gun",
             id: 8
           },
           pidWheelSpeed: {
-            type: "PIDWheelSpeed",
+            rule: "required",
+            type: "PIDParams",
             id: 9
           },
           pidChassisAngle: {
-            type: "PIDChassisAngle",
+            rule: "required",
+            type: "PIDParams",
             id: 10
           },
           pidAngleEcdPitch: {
-            type: "PIDAngleEcdPitch",
+            rule: "required",
+            type: "PIDParams",
             id: 11
           },
           pidAngleGyroPitch: {
-            type: "PIDAngleGyroPitch",
+            rule: "required",
+            type: "PIDParams",
             id: 12
           },
           pidAngleSpeedPitch: {
-            type: "PIDAngleSpeedPitch",
+            rule: "required",
+            type: "PIDParams",
             id: 13
           },
           pidAngleEcdYaw: {
-            type: "PIDAngleEcdYaw",
+            rule: "required",
+            type: "PIDParams",
             id: 14
           },
           pidAngleGyroYaw: {
-            type: "PIDAngleGyroYaw",
+            rule: "required",
+            type: "PIDParams",
             id: 15
           },
           pidAngleSpeedYaw: {
-            type: "PIDAngleSpeedYaw",
+            rule: "required",
+            type: "PIDParams",
             id: 16
           },
           pidFricSpeed: {
-            type: "PIDFricSpeed",
+            rule: "required",
+            type: "PIDParams",
             id: 17
           },
           pidFeedSpeed: {
-            type: "PIDFeedSpeed",
+            rule: "required",
+            type: "PIDParams",
             id: 18
           }
         }

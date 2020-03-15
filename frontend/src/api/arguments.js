@@ -7,13 +7,6 @@ export function getArguments() {
   })
 }
 
-export function resetArguments() {
-  return request({
-    url: '/argument/reset',
-    method: 'post'
-  })
-}
-
 export function setArguments(data) {
   return request({
     url: '/argument',
