@@ -8,17 +8,17 @@ message SerialPort {
 	string portName = 1;
 	int32 baudrate = 2;
 	enum Parity {
-		NoParity = 0; // Êó†Ê†°È™å
-		OddParity = 1; // Â•áÊ†°È™å
-		EvenParity = 2; // ÂÅ∂Ê†°È™å
-		MarkParity = 3; // Ê†áËÆ∞Ê†°È™å
+		NoParity = 0; // Œﬁ–£—È
+		OddParity = 1; // ∆Ê–£—È
+		EvenParity = 2; // ≈º–£—È
+		MarkParity = 3; // ±Íº«–£—È
 	}
 	Parity parity = 3;
 	int32 dataBit = 4;
 	enum StopBit {
-		OneStopBit = 0; // 1‰ΩçÂÅúÊ≠¢‰Ωç
-		One5StopBits = 1; // 1.5‰ΩçÂÅúÊ≠¢‰Ωç
-		TwoStopBits = 2; // 2‰ΩçÂÅúÊ≠¢‰Ωç
+		OneStopBit = 0; // 1ŒªÕ£÷πŒª
+		One5StopBits = 1; // 1.5ŒªÕ£÷πŒª
+		TwoStopBits = 2; // 2ŒªÕ£÷πŒª
 	}
 	StopBit stopBit = 5;
 	bool synchronize = 6;
@@ -37,8 +37,8 @@ message TestVideoSource {
 
 message Aimbot {
 	enum EnemyColor {
-		Red = 0; // Á∫¢Ëâ≤Êïå‰∫∫
-		Blue = 2; // ËìùËâ≤Êïå‰∫∫
+		Red = 0; // ∫Ï…´µ–»À
+		Blue = 2; // ¿∂…´µ–»À
 	}
 	EnemyColor enemyColor = 1;
 
@@ -80,7 +80,7 @@ message Chassis {
 } 
 
 message Gimbal {
-	string testGimbalVariant = 1;
+
 }
 
 message Gun {
@@ -95,79 +95,7 @@ message Gun {
 	int32 kFeedAutoRPM = 8;
 }
 
-message PIDWheelSpeed {
-	double kP = 1;
-	double kI = 2;
-	double kD = 3;
-	double thOut = 4;
-	double thIOut = 5;
-}
-
-message PIDChassisAngle {
-	double kP = 1;
-	double kI = 2;
-	double kD = 3;
-	double thOut = 4;
-	double thIOut = 5;
-}
-
-message PIDAngleEcdPitch {
-	double kP = 1;
-	double kI = 2;
-	double kD = 3;
-	double thOut = 4;
-	double thIOut = 5;
-}
-
-message PIDAngleEcdYaw  {
-	double kP = 1;
-	double kI = 2;
-	double kD = 3;
-	double thOut = 4;
-	double thIOut = 5;
-}
-
-message PIDAngleGyroPitch {
-	double kP = 1;
-	double kI = 2;
-	double kD = 3;
-	double thOut = 4;
-	double thIOut = 5;
-}
-
-message PIDAngleGyroYaw {
-	double kP = 1;
-	double kI = 2;
-	double kD = 3;
-	double thOut = 4;
-	double thIOut = 5;
-}
-
-message PIDAngleSpeedPitch {
-	double kP = 1;
-	double kI = 2;
-	double kD = 3;
-	double thOut = 4;
-	double thIOut = 5;
-}
-
-message PIDAngleSpeedYaw {
-	double kP = 1;
-	double kI = 2;
-	double kD = 3;
-	double thOut = 4;
-	double thIOut = 5;
-}
-
-message PIDFricSpeed {
-	double kP = 1;
-	double kI = 2;
-	double kD = 3;
-	double thOut = 4;
-	double thIOut = 5;
-}
-
-message PIDFeedSpeed {
+message PIDParams {
 	double kP = 1;
 	double kI = 2;
 	double kD = 3;
@@ -184,15 +112,15 @@ message Configuration {
 	Chassis chassis = 6;
 	Gimbal gimbal = 7;
 	Gun gun = 8;
-	PIDWheelSpeed pidWheelSpeed = 9;
-	PIDChassisAngle pidChassisAngle = 10;
-	PIDAngleEcdPitch pidAngleEcdPitch = 11;
-	PIDAngleGyroPitch pidAngleGyroPitch = 12;
-	PIDAngleSpeedPitch pidAngleSpeedPitch = 13;
-	PIDAngleEcdYaw pidAngleEcdYaw = 14;
-	PIDAngleGyroYaw pidAngleGyroYaw = 15;
-	PIDAngleSpeedYaw pidAngleSpeedYaw = 16;
-	PIDFricSpeed pidFricSpeed = 17;
-	PIDFeedSpeed pidFeedSpeed = 18;
+	PIDParams pidWheelSpeed = 9;
+	PIDParams pidChassisAngle = 10;
+	PIDParams pidAngleEcdPitch = 11;
+	PIDParams pidAngleGyroPitch = 12;
+	PIDParams pidAngleSpeedPitch = 13;
+	PIDParams pidAngleEcdYaw = 14;
+	PIDParams pidAngleGyroYaw = 15;
+	PIDParams pidAngleSpeedYaw = 16;
+	PIDParams pidFricSpeed = 17;
+	PIDParams pidFeedSpeed = 18;
 }
 
