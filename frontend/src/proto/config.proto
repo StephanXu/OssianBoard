@@ -1,4 +1,3 @@
-
 syntax = "proto3";
 //option optimize_for = LITE_RUNTIME;
 
@@ -123,4 +122,3 @@ message Configuration {
 	required PIDParams pidFricSpeed = 17;
 	required PIDParams pidFeedSpeed = 18;
 }
-
