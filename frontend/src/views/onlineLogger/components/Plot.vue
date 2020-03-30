@@ -85,6 +85,7 @@ export default {
         series: [
           ...this.values.map(item => {
             return {
+              name: item.varName,
               data: item.values,
               type: "line"
             };
