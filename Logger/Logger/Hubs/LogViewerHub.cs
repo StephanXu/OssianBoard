@@ -19,9 +19,9 @@ namespace Logger.Hubs
             _logService = logService;
         }
 
-        public IEnumerable<LogListItem> ListLogs() => _logService.ListLogs();
+        public IEnumerable<LogModel> ListLogs() => _logService.ListLogs();
 
-        public async Task<LogModel> GetLog(string logId) => await _logService.GetLog(logId);
+        public IEnumerable<RecordModel> GetLog(string logId) => _logService.GetLog(logId);
 
         public async Task RemoveLog(string logId)
         {

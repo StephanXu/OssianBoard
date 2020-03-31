@@ -35,7 +35,7 @@ namespace Logger
             services.AddSignalR(option => { option.MaximumReceiveMessageSize = null; });
             services.AddScoped<UserService>();
             services.AddScoped<ArgumentService>();
-            services.AddScoped<ILogService, LogService>();
+            services.AddSingleton<ILogService, LogService>();
             
             var key = Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings")["Secret"]);
             services.AddAuthentication(option =>

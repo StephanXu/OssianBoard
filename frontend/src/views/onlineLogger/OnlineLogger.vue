@@ -9,7 +9,7 @@
             calculate-widths
             :headers="logTableHeader"
             :items="logs"
-            item-key="time"
+            item-key="id"
           >
             <template v-slot:top>
               <v-toolbar flat>
@@ -114,13 +114,13 @@ export default {
     this.loading = true;
     this.connection.invoke("ListenLog", this.logId);
     this.connection.invoke("GetLog", this.logId).then(res => {
-      res.log = res.log.sort(
+      res = res.sort(
         (lhs, rhs) => Date.parse(rhs.time) - Date.parse(lhs.time)
       );
-      res.log.forEach(element => {
+      res.forEach(element => {
         this.parseLog(element);
       });
-      this.logs.push(...res.log);
+      this.logs = this.logs.concat(res);
       this.loading = false;
     });
   },
@@ -144,7 +144,7 @@ export default {
           });
           figureIndex = this.figures.length - 1;
         }
-        const regexAssignPattern = /\$(?<varName>\w+)\s*=\s*(?<value>[0-9]*)/g;
+        const regexAssignPattern = /\$(?<varName>\w+)\s*=\s*(?<value>[0-9e\-+.]*)/g
         let assignMatch = null;
         while (
           (assignMatch = regexAssignPattern.exec(
