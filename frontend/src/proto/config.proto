@@ -76,6 +76,8 @@ message PoseSolver {
 
 message Chassis {  
 	required double kTopWz = 1;
+	required double kVxFilterCoef = 2;
+	required double kVyFilterCoef = 3;
 } 
 
 message Gimbal {
