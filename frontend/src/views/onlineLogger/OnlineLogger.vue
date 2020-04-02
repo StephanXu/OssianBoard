@@ -144,7 +144,7 @@ export default {
           });
           figureIndex = this.figures.length - 1;
         }
-        const regexAssignPattern = /\$(?<varName>\w+)\s*=\s*(?<value>[0-9e\-+.]*)/g
+        const regexAssignPattern = /\$(?<varName>\w+)\s*=\s*(?<value>[-0-9e+.]*)/g
         let assignMatch = null;
         while (
           (assignMatch = regexAssignPattern.exec(
