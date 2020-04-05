@@ -32,9 +32,9 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-for="item in figures" :key="item.name">
       <v-col cols="12">
-        <v-card v-for="item in figures" :key="item.name" class="mx-auto" tle>
+        <v-card class="mx-auto" tle>
           <v-card-title>{{ item.name }}</v-card-title>
           <plot
             style="height: 500px;width: 100%"
