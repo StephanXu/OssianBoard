@@ -21,7 +21,12 @@ namespace Logger.Hubs
 
         public IEnumerable<LogModel> ListLogs() => _logService.ListLogs();
 
-        public IEnumerable<RecordModel> GetLog(string logId) => _logService.GetLog(logId);
+        public IEnumerable<RecordModel> GetLog(string logId, int page, int itemsPerPage) =>
+            _logService.GetLog(logId, page, itemsPerPage);
+
+        public IEnumerable<PlotRequest> GetPlots(string logId) => _logService.GetPlots(logId);
+
+        public LogModel GetLogMeta(string logId) => _logService.GetLogMeta(logId);
 
         public async Task RemoveLog(string logId)
         {

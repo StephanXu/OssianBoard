@@ -2,7 +2,7 @@
   <v-navigation-drawer v-model="drawer" app clipped width="400px">
     <v-divider />
 
-    <v-item-group>
+    <v-item-group v-model="selectedLogIndex">
       <v-container>
         <v-row v-for="item in logList" :key="item.id">
           <v-col cols="12">
@@ -12,7 +12,7 @@
                   grey: active && $vuetify.theme.dark,
                   'darken-4': active && $vuetify.theme.dark,
                   blue: active && !$vuetify.theme.dark,
-                  'lighten-4': active && !$vuetify.theme.dark
+                  'lighten-4': active && !$vuetify.theme.dark,
                 }"
                 @click="toggle"
                 outlined
@@ -40,58 +40,42 @@
 
 <script>
 import { mapGetters } from "vuex";
-
+import { removeLog } from "@/api/log";
 export default {
   name: "DefaultNavigator",
   props: {
     value: {
       type: Boolean,
-      default: () => null
-    }
+      default: () => null,
+    },
   },
   data() {
     return {
       currentView: null,
-      logListData: []
+      logListData: [],
+      selectedLogId: this.$route.params.logId,
     };
   },
   computed: {
-    ...mapGetters("log", ["connection", "connectionStatus"]),
+    ...mapGetters("log", ["connection", "connectionStatus", "logList"]),
     drawer: {
       get() {
         return this.value;
       },
       set(val) {
         this.$emit("input", val);
-      }
-    },
-    logList: {
-      get() {
-        return this.logListData;
       },
-      set(val) {
-        this.logListData = val
-          .sort(
-            (lhs, rhs) =>
-              Date.parse(rhs.createTime) - Date.parse(lhs.createTime)
-          )
-          .map(item => {
-            return {
-              ...item,
-              createTime: new Date(item.createTime).toLocaleString()
-            };
-          });
-      }
+    },
+    selectedLogIndex: {
+      get() {
+        return this.logList.findIndex((item) => item.id === this.selectedLogId);
+      },
+      set() {
+      },
     }
   },
   async created() {
-    if (!this.connectionStatus) {
-      await this.$store.dispatch("log/connect");
-      this.connection.on("RefreshLogsList", logList => {
-        this.logList = logList;
-      });
-    }
-    this.logList = await this.connection.invoke("ListLogs");
+    await this.$store.dispatch("log/refreshLogList");
   },
   methods: {
     async logout() {
@@ -102,19 +86,8 @@ export default {
       this.$router.push({ path: row.redirect });
     },
     handleDeleteLog(logId) {
-      this.connection.invoke("RemoveLog", logId);
+      removeLog(logId);
     },
-    listItemClass(active) {
-      console.log(this.$vuetify.theme.dark);
-      let a = {
-        gray: active && this.$vuetify.theme.dark,
-        "darken-4": active && this.$vuetify.theme.dark,
-        blue: active && !this.$vuetify.theme.dark,
-        "lighten-4": active && !this.$vuetify.theme.dark
-      };
-      console.log(a);
-      return a;
-    }
-  }
+  },
 };
 </script>

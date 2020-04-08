@@ -1,5 +1,5 @@
 <template>
-  <v-chart autoresize :options="option" />
+  <v-chart autoresize :options="option"/>
 </template>
 
 <script>
@@ -15,10 +15,6 @@ import "echarts/lib/component/toolbox";
 export default {
   props: {
     values: {
-      type: Array,
-      default: () => [],
-    },
-    times: {
       type: Array,
       default: () => [],
     },
@@ -75,18 +71,22 @@ export default {
         dataZoom: [
           {
             type: "inside",
-            startValue:
-              this.sortedTimes.length >= 200
-                ? this.sortedTimes[this.sortedTimes.length - 200]
-                : this.sortedTimes[0],
-            endValue: this.sortedTimes[this.sortedTimes.length - 1],
+            start: 90,
+            end: 100,
+            // startValue:
+            //   this.sortedTimes.length >= 200
+            //     ? this.sortedTimes[this.sortedTimes.length - 200]
+            //     : this.sortedTimes[0],
+            // endValue: this.sortedTimes[this.sortedTimes.length - 1],
           },
           {
-            startValue:
-              this.sortedTimes.length >= 200
-                ? this.sortedTimes[this.sortedTimes.length - 200]
-                : this.sortedTimes[0],
-            endValue: this.sortedTimes[this.sortedTimes.length - 1],
+            start: 90,
+            end: 100,
+            // startValue:
+            //   this.sortedTimes.length >= 200
+            //     ? this.sortedTimes[this.sortedTimes.length - 200]
+            //     : this.sortedTimes[0],
+            // endValue: this.sortedTimes[this.sortedTimes.length - 1],
             handleIcon:
               "M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z",
             handleSize: "80%",
@@ -102,11 +102,8 @@ export default {
         series: [
           ...this.values.map((item) => {
             return {
-              name: item.varName,
-              data: item.values.map((valueItem, index) => [
-                item.times[index],
-                item.values[index],
-              ]),
+              name: item.name,
+              data: item.dots.map((element) => [element.time, element.value]),
               type: "line",
             };
           }),
@@ -116,6 +113,8 @@ export default {
   },
   data() {
     return {};
+  },
+  methods: {
   },
 };
 </script>

@@ -10,6 +10,11 @@
             :headers="logTableHeader"
             :items="logs"
             item-key="id"
+            :server-items-length="logMeta.recordCount"
+            :items-per-page="itemsPerPage"
+            :page="currentPage"
+            @pagination="handlePagination"
+            :loading="loading"
           >
             <template v-slot:top>
               <v-toolbar flat>
@@ -37,9 +42,8 @@
         <v-card class="mx-auto" tle>
           <v-card-title>{{ item.name }}</v-card-title>
           <plot
-            style="height: 500px;width: 100%"
+            style="height: 500px; width: 100%;"
             :values="item.variables"
-            :times="item.variables[0].times"
           ></plot>
         </v-card>
       </v-col>
@@ -50,15 +54,16 @@
 <script>
 import Plot from "./components/Plot";
 import { mapGetters } from "vuex";
+import { getLog } from "@/api/log";
 export default {
   components: {
-    Plot
+    Plot,
   },
   props: {
     logId: {
       type: String,
-      default: () => null
-    }
+      default: () => null,
+    },
   },
   data() {
     return {
@@ -71,17 +76,26 @@ export default {
         {
           text: "Time",
           value: "time",
-          width: "20%"
+          width: "20%",
         },
         { text: "Thread", value: "threadId", width: "10%" },
         { text: "Level", value: "level", width: "10%" },
-        { text: "Content", value: "content" }
+        { text: "Content", value: "content" },
       ],
-      loading: false
+      loading: false,
+      itemsPerPage: 10,
+      currentPage: 1,
+      logMeta: {
+        id: "",
+        createTime: "",
+        description: "",
+        name: "",
+        recordCount: 0,
+      },
     };
   },
   computed: {
-    ...mapGetters("log", ["connection", "connectionStatus"]),
+    ...mapGetters("log", ["connection", "connectionStatus", "logList"]),
     connected() {
       try {
         return this.connection.connectionState === "Connected";
@@ -91,7 +105,7 @@ export default {
     },
     isEmptyId() {
       return this.logId == "index" || this.logId == "";
-    }
+    },
   },
   async created() {
     if (this.isEmptyId) {
@@ -100,27 +114,31 @@ export default {
     if (!this.connectionStatus) {
       await this.$store.dispatch("log/connect");
     }
-    this.connection.on("ReceiveLog", (logId, logs) => {
-      if (this.logId === logId) {
-        logs = logs.sort(
-          (lhs, rhs) => Date.parse(rhs.time) - Date.parse(lhs.time)
-        );
-        this.logs.splice(0, 0, ...logs);
-        logs.forEach(element => {
-          this.parseLog(element);
-        });
+
+    let logMetaCache = this.logList.find((item) => item.id === this.logId);
+    this.logMeta =
+      logMetaCache == null
+        ? await this.connection.invoke("GetLogMeta", this.logId)
+        : logMetaCache;
+
+    this.connection.on("ReceiveLog", (increment) => {
+      this.mergePlot(increment.plots);
+      this.logMeta.recordCount += increment.records.length;
+      if (this.currentPage == 1) {
+        if (increment.records.length >= this.itemsPerPage) {
+          this.logs = increment.records.slice(0, this.itemsPerPage);
+        } else {
+          this.logs = this.logs
+            .slice(0, this.itemsPerPage - increment.records.length)
+            .concat(increment.records);
+        }
       }
     });
     this.loading = true;
     this.connection.invoke("ListenLog", this.logId);
-    this.connection.invoke("GetLog", this.logId).then(res => {
-      res = res.sort(
-        (lhs, rhs) => Date.parse(rhs.time) - Date.parse(lhs.time)
-      );
-      res.forEach(element => {
-        this.parseLog(element);
-      });
-      this.logs = this.logs.concat(res);
+    this.connection.invoke("GetPlots", this.logId).then((res) => {
+      console.log(res);
+      this.mergePlot(res);
       this.loading = false;
     });
   },
@@ -131,20 +149,44 @@ export default {
     }
   },
   methods: {
+    mergePlot(plots) {
+      plots.forEach((element) => {
+        let plotIndex = this.figures.findIndex(
+          (item) => item.name === element.name
+        );
+        if (plotIndex == -1) {
+          this.figures.push(element);
+          return;
+        }
+        element.variables.forEach((variable) => {
+          let variableIndex = this.figures[plotIndex].variables.findIndex(
+            (item) => item.name === variable.name
+          );
+          if (variableIndex == -1) {
+            this.figures[plotIndex].variables.push(variable);
+            return;
+          }
+          let dots = this.figures[plotIndex].variables[variableIndex].dots;
+          this.figures[plotIndex].variables[variableIndex].dots = dots.concat(
+            variable.dots
+          );
+        });
+      });
+    },
     parseLog(log) {
       try {
         let figureName = log.content.match(/@(\w+)/)[1];
         let figureIndex = this.figures.findIndex(
-          item => item.name === figureName
+          (item) => item.name === figureName
         );
         if (figureIndex == -1) {
           this.figures.push({
             name: figureName,
-            variables: []
+            variables: [],
           });
           figureIndex = this.figures.length - 1;
         }
-        const regexAssignPattern = /\$(?<varName>\w+)\s*=\s*(?<value>[-0-9e+.]*)/g
+        const regexAssignPattern = /\$(?<varName>\w+)\s*=\s*(?<value>[-0-9e+.]*)/g;
         let assignMatch = null;
         while (
           (assignMatch = regexAssignPattern.exec(
@@ -152,13 +194,13 @@ export default {
           ))
         ) {
           let varIndex = this.figures[figureIndex].variables.findIndex(
-            item => item.varName === assignMatch.groups.varName
+            (item) => item.varName === assignMatch.groups.varName
           );
           if (varIndex == -1) {
             this.figures[figureIndex].variables.push({
               varName: assignMatch.groups.varName,
               times: [new Date(log.time)],
-              values: [Number(assignMatch.groups.value)]
+              values: [Number(assignMatch.groups.value)],
             });
           } else {
             this.figures[figureIndex].variables[varIndex].times.push(
@@ -182,28 +224,13 @@ export default {
       else if (level === "critical") return "red";
       return "";
     },
-    async connect() {
-      this.connection.on("ReceiveLog", (clientId, varName, value, times) => {
-        let varObj = this.onlineVariants.find(item => item.varName === varName);
-        if (!varObj) {
-          this.onlineVariants.push({
-            varName: varName,
-            dots: value,
-            times: times
-          });
-          return;
-        }
-        varObj.dots = varObj.dots.concat(value);
-        varObj.times = varObj.times.concat(times);
-        if (varObj.dots.length > 100) {
-          varObj.dots.splice(0, varObj.dots.length - 100);
-          varObj.times.splice(0, varObj.times.length - 100);
-        }
-      });
+    async handlePagination({ page, itemsPerPage }) {
+      this.loading = true;
+      this.currentPage = page;
+      this.itemsPerPage = itemsPerPage;
+      this.logs = await getLog(this.logId, page, itemsPerPage);
+      this.loading = false;
     },
-    async disconnect() {
-      await this.connection.stop();
-    }
-  }
+  },
 };
 </script>
