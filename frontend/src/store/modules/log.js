@@ -3,6 +3,9 @@ import {
     LogLevel
 } from "@microsoft/signalr";
 import {
+    MessagePackHubProtocol
+} from '@microsoft/signalr-protocol-msgpack'
+import {
     getToken
 } from "@/utils/auth";
 import {
@@ -17,6 +20,7 @@ export default {
             .withUrl("/log-viewer", {
                 accessTokenFactory: () => getToken()
             })
+            .withHubProtocol(new MessagePackHubProtocol())
             .withAutomaticReconnect()
             .configureLogging(LogLevel.Information)
             .build(),

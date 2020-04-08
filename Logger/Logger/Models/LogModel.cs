@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MessagePack;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -12,23 +13,29 @@ namespace Logger.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         public DateTime CreateTime { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public int RecordCount { get; set; }
     }
 
+    [MessagePackObject]
     public class RecordModel
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [Key("id")]
         public string Id { get; set; }
+
         [BsonRepresentation(BsonType.ObjectId)]
+        [Key("logId")]
         public string LogId { get; set; }
-        public DateTime Time { get; set; }
-        public int ThreadId { get; set; }
-        public string Level { get; set; }
-        public string Content { get; set; }
+
+        [Key("time")] public DateTime Time { get; set; }
+        [Key("threadId")] public int ThreadId { get; set; }
+        [Key("level")] public string Level { get; set; }
+        [Key("content")] public string Content { get; set; }
     }
 
     public class VariableModel
@@ -36,8 +43,10 @@ namespace Logger.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         [BsonRepresentation(BsonType.ObjectId)]
         public string LogId { get; set; }
+
         public string Name { get; set; }
     }
 
@@ -46,10 +55,13 @@ namespace Logger.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         [BsonRepresentation(BsonType.ObjectId)]
         public string VariableId { get; set; }
+
         [BsonRepresentation(BsonType.ObjectId)]
         public string RecordId { get; set; }
+
         public int ZoomLevel { get; set; }
         public long Time { get; set; }
         public double Value { get; set; }
@@ -60,34 +72,41 @@ namespace Logger.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
         [BsonRepresentation(BsonType.ObjectId)]
         public string LogId { get; set; }
+
         public string Name { get; set; }
+
         [BsonRepresentation(BsonType.ObjectId)]
         public List<string> Variables { get; set; }
     }
 
+    [MessagePackObject]
     public class DotRequest
     {
-        public long Time { get; set; }
-        public double Value { get; set; }
+        [Key("time")] public long Time { get; set; }
+        [Key("value")] public double Value { get; set; }
     }
 
+    [MessagePackObject]
     public class VariableRequest
     {
-        public string Name { get; set; }
-        public List<DotRequest> Dots { get; set; }
+        [Key("name")] public string Name { get; set; }
+        [Key("dots")] public List<DotRequest> Dots { get; set; }
     }
 
+    [MessagePackObject]
     public class PlotRequest
     {
-        public string Name { get; set; }
-        public List<VariableRequest> Variables { get; set; }
+        [Key("name")] public string Name { get; set; }
+        [Key("variables")] public List<VariableRequest> Variables { get; set; }
     }
 
+    [MessagePackObject]
     public class IncrementRequest
     {
-        public List<RecordModel> Records { get; set; }
-        public List<PlotRequest> Plots { get; set; }
+        [Key("records")] public List<RecordModel> Records { get; set; }
+        [Key("plots")] public List<PlotRequest> Plots { get; set; }
     }
 }

@@ -32,7 +32,9 @@ namespace Logger
         {
             services.AddControllers();
             services.AddCors();
-            services.AddSignalR(option => { option.MaximumReceiveMessageSize = null; });
+            services.AddSignalR(option => { option.MaximumReceiveMessageSize = null; })
+                .AddMessagePackProtocol()
+                .AddJsonProtocol();
             services.AddScoped<UserService>();
             services.AddScoped<ArgumentService>();
             services.AddSingleton<ILogService, LogService>();
