@@ -31,24 +31,24 @@ class Logger : public signalr::log_writer
 	}
 };
 
-class OnlineLogHub :public BaseHub
+class OnlineLogHub : public BaseHub
 {
 public:
 	OnlineLogHub() = delete;
 
-	OnlineLogHub(signalr::hub_connection&& connection) :BaseHub(std::move(connection))
+	OnlineLogHub(signalr::hub_connection&& connection) : BaseHub(std::move(connection))
 	{
 		HUB_REGISTER_CALLBACK(ReloadSettings);
 		Start();
 	}
 
-	static auto ReloadSettings(std::string settings)->void
+	static auto ReloadSettings(std::string settings) -> void
 	{
 		std::cout << settings << std::endl;
 	}
 };
 
-template<typename Mutex>
+template <typename Mutex>
 class online_logger_sink : public spdlog::sinks::base_sink<Mutex>
 {
 	OnlineLogHub m_Hub;
@@ -56,9 +56,9 @@ class online_logger_sink : public spdlog::sinks::base_sink<Mutex>
 	std::string m_LogId;
 public:
 	online_logger_sink(std::string url)
-		:m_Hub(signalr::hub_connection_builder::create(url)
-			   .with_logging(std::make_shared<Logger>(), signalr::trace_level::all)
-			   .build())
+		: m_Hub(signalr::hub_connection_builder::create(url)
+		        .with_logging(std::make_shared<Logger>(), signalr::trace_level::all)
+		        .build())
 	{
 		std::promise<void> waitTask;
 		m_Hub.Invoke("CreateLog", std::string("Ossian Client"), std::string("PID debugging")).Then<std::string>(
@@ -95,21 +95,42 @@ int main()
 	spdlog::set_pattern("[%T.%e] [%-5t] %^[%l]%$  %v");
 	spdlog::set_level(spdlog::level::info);
 	//spdlog::flush_on(spdlog::level::trace);
-	//spdlog::flush_every(std::chrono::seconds(1));
-	
+	spdlog::flush_every(std::chrono::seconds(1));
+
 	auto onlineLogger = std::make_shared<spdlog::logger>(
 		"onlineLogger",
-		std::make_shared<online_logger_sink_mt>("http://host.docker.internal:4000/logger"));
+		std::make_shared<online_logger_sink_mt>("http://debug.fenzhengrou.wang:5000/logger"));
 	onlineLogger->set_pattern("[%Y-%m-%dT%T.%e%z] [%-5t] %^[%l]%$ %v");
 	spdlog::register_logger(onlineLogger);
 
 	std::default_random_engine random(std::time(nullptr));
-	onlineLogger->flush_on(spdlog::level::trace);
+	std::uniform_real_distribution<double> uniformDist(-10, 10);
+	//onlineLogger->flush_on(spdlog::level::trace);
 	while (true)
 	{
-		onlineLogger->log(static_cast<spdlog::level::level_enum>(random() % 6),
-						  "@Fig1=[$var1={},$var2={}]", random(), random());
-		
+		//onlineLogger->log(static_cast<spdlog::level::level_enum>(random() % 6),
+		//				  "@Fig1=[$var1={},$var2={}]",
+		//				  uniformDist(random) / 100.0f,
+		//				  uniformDist(random) / 100.0f);
+		for (int i{}; i < 100; ++i) 
+		{
+			onlineLogger->log(static_cast<spdlog::level::level_enum>(random() % 6),
+							  "@Fig1=[$var1={}]",
+							  1);
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			onlineLogger->log(static_cast<spdlog::level::level_enum>(random() % 6),
+							  "@Fig1=[$var2={}]",
+							  2);
+		}
+		for (int i{}; i < 3; ++i) {
+			onlineLogger->log(static_cast<spdlog::level::level_enum>(random() % 6),
+							  "@Fig1=[$var1={}]",
+							  0.5);
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			onlineLogger->log(static_cast<spdlog::level::level_enum>(random() % 6),
+							  "@Fig1=[$var2={}]",
+							  1);
+		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 	return 0;
