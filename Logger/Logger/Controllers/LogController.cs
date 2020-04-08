@@ -42,7 +42,8 @@ namespace Logger.Controllers
         public IEnumerable<PlotRequest> GetPlots(string logId) => _logService.GetPlots(logId);
 
         [HttpGet("{logId}")]
-        public IEnumerable<RecordModel> GetLog([FromRoute] string logId,
+        public IEnumerable<RecordModel> GetLog(
+            [FromRoute] string logId,
             [FromQuery(Name = "page")] int page,
             [FromQuery(Name = "items-per-page")] int itemsPerPage) =>
             _logService.GetLog(logId, page, itemsPerPage);
