@@ -137,7 +137,6 @@ export default {
     this.loading = true;
     this.connection.invoke("ListenLog", this.logId);
     this.connection.invoke("GetPlots", this.logId).then((res) => {
-      console.log(res);
       this.mergePlot(res);
       this.loading = false;
     });
