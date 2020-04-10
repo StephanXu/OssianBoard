@@ -129,85 +129,94 @@ namespace Logger.Services
                 incrementRecord.Add(newRecord);
                 _recordCollection.InsertOne(newRecord);
                 log.RecordCount += 1;
-
-                // Parse plot
-                var plotName = Regex.Matches(content, @"@(?<plotName>\w+)")[0].Groups["plotName"].Value;
-                var plot = _plotCollection.FindSync(curt => curt.LogId == log.Id && curt.Name == plotName)
-                    .FirstOrDefault();
-                if (plot == null)
+                try
                 {
-                    plot = new PlotModel
-                    {
-                        Id = null,
-                        LogId = log.Id,
-                        Name = plotName,
-                        Variables = new List<string>()
-                    };
-                    _plotCollection.InsertOne(plot);
-                }
-
-                var deltaPlot = incrementPlot.Find(curt => curt.Name == plotName);
-                if (deltaPlot == null)
-                {
-                    deltaPlot = new PlotRequest
-                    {
-                        Name = plotName,
-                        Variables = new List<VariableRequest>()
-                    };
-                    incrementPlot.Add(deltaPlot);
-                }
-
-                // Parse variable assignment
-                var assignment = Regex.Matches(content, @"\[(?<assignment>.*?)\]")[0].Groups["assignment"].Value;
-                foreach (Match match in Regex.Matches(assignment, @"\$(?<varName>\w+)\s*=\s*(?<value>[0-9e\-+.]*)"))
-                {
-                    var varName = match.Groups["varName"].Value;
-                    var value = match.Groups["value"].Value;
-                    var variable = _variableCollection
-                        .FindSync(curt => curt.LogId == log.Id && curt.Name == varName)
+                    // Parse plot
+                    var plotName = Regex.Matches(content, @"@(?<plotName>\w+)")[0].Groups["plotName"].Value;
+                    var plot = _plotCollection.FindSync(curt => curt.LogId == log.Id && curt.Name == plotName)
                         .FirstOrDefault();
-                    if (variable == null)
+                    if (plot == null)
                     {
-                        variable = new VariableModel
+                        plot = new PlotModel
                         {
                             Id = null,
                             LogId = log.Id,
-                            Name = varName
+                            Name = plotName,
+                            Variables = new List<string>()
                         };
-                        _variableCollection.InsertOne(variable);
-                        plot.Variables.Add(variable.Id);
-                        _plotCollection.ReplaceOne(item => item.Id == plot.Id, plot);
+                        _plotCollection.InsertOne(plot);
                     }
 
-                    var deltaVariable = deltaPlot.Variables.Find(curt => curt.Name == varName);
-                    if (deltaVariable == null)
+                    var deltaPlot = incrementPlot.Find(curt => curt.Name == plotName);
+                    if (deltaPlot == null)
                     {
-                        deltaVariable = new VariableRequest
+                        deltaPlot = new PlotRequest
                         {
-                            Name = varName,
-                            Dots = new List<DotRequest>()
+                            Name = plotName,
+                            Variables = new List<VariableRequest>()
                         };
-                        deltaPlot.Variables.Add(deltaVariable);
+                        incrementPlot.Add(deltaPlot);
                     }
 
-                    deltaVariable.Dots.Add(new DotRequest
+                    // Parse variable assignment
+                    var assignment = Regex.Matches(content, @"\[(?<assignment>.*?)\]")[0].Groups["assignment"].Value;
+                    foreach (Match match in Regex.Matches(assignment, @"\$(?<varName>\w+)\s*=\s*(?<value>[0-9e\-+.]*)"))
                     {
-                        Time = timestamp,
-                        Value = Double.Parse(value)
-                    });
-                    dots.Add(new DotModel
-                    {
-                        Id = null,
-                        Time = timestamp,
-                        Value = Double.Parse(value),
-                        VariableId = variable.Id,
-                        ZoomLevel = 0,
-                        RecordId = newRecord.Id
-                    });
+                        var varName = match.Groups["varName"].Value;
+                        var value = match.Groups["value"].Value;
+                        var variable = _variableCollection
+                            .FindSync(curt => curt.LogId == log.Id && curt.Name == varName)
+                            .FirstOrDefault();
+                        if (variable == null)
+                        {
+                            variable = new VariableModel
+                            {
+                                Id = null,
+                                LogId = log.Id,
+                                Name = varName
+                            };
+                            _variableCollection.InsertOne(variable);
+                            plot.Variables.Add(variable.Id);
+                            _plotCollection.ReplaceOne(item => item.Id == plot.Id, plot);
+                        }
+
+                        var deltaVariable = deltaPlot.Variables.Find(curt => curt.Name == varName);
+                        if (deltaVariable == null)
+                        {
+                            deltaVariable = new VariableRequest
+                            {
+                                Name = varName,
+                                Dots = new List<DotRequest>()
+                            };
+                            deltaPlot.Variables.Add(deltaVariable);
+                        }
+
+                        deltaVariable.Dots.Add(new DotRequest
+                        {
+                            Time = timestamp,
+                            Value = Double.Parse(value)
+                        });
+                        dots.Add(new DotModel
+                        {
+                            Id = null,
+                            Time = timestamp,
+                            Value = Double.Parse(value),
+                            VariableId = variable.Id,
+                            ZoomLevel = 0,
+                            RecordId = newRecord.Id
+                        });
+                    }
+                }
+                catch (System.ArgumentOutOfRangeException)
+                {
                 }
             }
 
-            await _dotCollection.InsertManyAsync(dots);
+            if (dots.Count > 0)
+            {
+                await _dotCollection.InsertManyAsync(dots);
+            }
+
             await _logCollection.ReplaceOneAsync(item => item.Id == log.Id, log);
             return new IncrementRequest
             {
