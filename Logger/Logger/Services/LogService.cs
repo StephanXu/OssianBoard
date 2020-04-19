@@ -46,6 +46,7 @@ namespace Logger.Services
         public IEnumerable<RecordModel> GetLog(string logId, int page, int itemsPerPage) =>
             _recordCollection.AsQueryable()
                 .Where(item => item.LogId == logId)
+                .OrderByDescending(item => item.Time)
                 .Skip(itemsPerPage * (page - 1))
                 .Take(itemsPerPage);
 
@@ -164,9 +165,8 @@ namespace Logger.Services
                     {
                         var varName = match.Groups["varName"].Value;
                         var value = match.Groups["value"].Value;
-                        var variable = _variableCollection
-                            .FindSync(curt => curt.LogId == log.Id && curt.Name == varName)
-                            .FirstOrDefault();
+                        var variable = _variableCollection.AsQueryable()
+                            .FirstOrDefault(curt => curt.LogId == log.Id && curt.Name == varName);
                         if (variable == null)
                         {
                             variable = new VariableModel
@@ -177,7 +177,7 @@ namespace Logger.Services
                             };
                             _variableCollection.InsertOne(variable);
                             plot.Variables.Add(variable.Id);
-                            _plotCollection.ReplaceOne(item => item.Id == plot.Id, plot);
+                            _plotCollection.ReplaceOne(curt => curt.Id == plot.Id, plot);
                         }
 
                         var deltaVariable = deltaPlot.Variables.Find(curt => curt.Name == varName);
