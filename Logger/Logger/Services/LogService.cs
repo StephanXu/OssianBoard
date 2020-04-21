@@ -16,6 +16,7 @@ namespace Logger.Services
     public interface ILogService
     {
         public IEnumerable<RecordModel> GetLog(string logId, int page, int itemsPerPage);
+        public RawLogNavigator GetLogByTime(string logId, int itemsPerPage, DateTime time);
         public IEnumerable<PlotRequest> GetPlots(string logId);
         public Task<LogModel> CreateLog(string name, string description);
         public IEnumerable<LogModel> ListLogs();
@@ -49,6 +50,29 @@ namespace Logger.Services
                 .OrderByDescending(item => item.Time)
                 .Skip(itemsPerPage * (page - 1))
                 .Take(itemsPerPage);
+
+
+        public RawLogNavigator GetLogByTime(string logId, int itemsPerPage, DateTime time)
+        {
+            if (itemsPerPage == 0)
+            {
+                return null;
+            }
+
+            var recordList = _recordCollection
+                .AsQueryable()
+                .Where(item => item.LogId == logId)
+                .OrderByDescending(item => item.Time)
+                .ToList();
+            var recordIndex = recordList.FindIndex(item => item.Time == time);
+            return recordIndex == -1
+                ? null
+                : new RawLogNavigator
+                {
+                    Page = recordIndex / itemsPerPage + 1,
+                    Records = GetLog(logId, recordIndex / itemsPerPage + 1, itemsPerPage)
+                };
+        }
 
         public IEnumerable<PlotRequest> GetPlots(string logId)
         {
@@ -102,7 +126,7 @@ namespace Logger.Services
             _logCollection.AsQueryable()
                 .Where(item => true);
 
-        public LogModel GetLogMeta(string logId) => 
+        public LogModel GetLogMeta(string logId) =>
             _logCollection.AsQueryable().First(item => item.Id == logId);
 
         public async Task<IncrementRequest> AddRecord(string logId, IEnumerable<string> record)

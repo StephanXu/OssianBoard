@@ -24,9 +24,21 @@ export function getPlot(logId) {
 export function getLog(logId, page, itemsPerPage) {
     return request({
         url: `log/${logId}`,
+        method: 'get',
         params: {
             'page': page,
             'items-per-page': itemsPerPage
         }
+    })
+}
+
+export function getLogByTime(logId, time, itemsPerPage) {
+    return request({
+        url: `log/${logId}/time-navigation`,
+        method: 'get',
+        params: {
+            'time': time,
+            'items-per-page': itemsPerPage
+        },
     })
 }

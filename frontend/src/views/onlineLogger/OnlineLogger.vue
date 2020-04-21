@@ -44,6 +44,7 @@
           <plot
             style="height: 500px; width: 100%;"
             :values="item.variables"
+            @click="handlePlotClick"
           ></plot>
         </v-card>
       </v-col>
@@ -54,7 +55,7 @@
 <script>
 import Plot from "./components/Plot";
 import { mapGetters } from "vuex";
-import { getLog } from "@/api/log";
+import { getLog, getLogByTime } from "@/api/log";
 export default {
   components: {
     Plot,
@@ -224,10 +225,24 @@ export default {
       return "";
     },
     async handlePagination({ page, itemsPerPage }) {
+      if (this.currentPage == page && this.logs.length != 0) {
+        return;
+      }
       this.loading = true;
       this.currentPage = page;
       this.itemsPerPage = itemsPerPage;
       this.logs = await getLog(this.logId, page, itemsPerPage);
+      this.loading = false;
+    },
+    async handlePlotClick({ data }) {
+      this.loading = true;
+      let { page, records } = await getLogByTime(
+        this.logId,
+        data[0],
+        this.itemsPerPage
+      );
+      this.currentPage = page;
+      this.logs = records;
       this.loading = false;
     },
   },

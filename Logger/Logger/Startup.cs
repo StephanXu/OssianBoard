@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Logger.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Logger
@@ -32,7 +33,10 @@ namespace Logger
         {
             services.AddControllers();
             services.AddCors();
-            services.AddSignalR(option => { option.MaximumReceiveMessageSize = null; })
+            services.AddSignalR(option =>
+                {
+                    option.MaximumReceiveMessageSize = null;
+                })
                 .AddMessagePackProtocol()
                 .AddJsonProtocol();
             services.AddScoped<UserService>();

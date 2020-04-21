@@ -1,5 +1,5 @@
 <template>
-  <v-chart autoresize :options="option"/>
+  <v-chart autoresize :options="option" @click="handlePlotClick" />
 </template>
 
 <script>
@@ -46,7 +46,7 @@ export default {
         xAxis: {
           type: "time",
           axisLabel: {
-            formatter: function (value) {
+            formatter: function(value) {
               let date = new Date(value);
               return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
             },
@@ -54,7 +54,7 @@ export default {
           axisPointer: {
             label: {
               show: true,
-              formatter: function (params) {
+              formatter: function(params) {
                 let date = new Date(params.value);
                 return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`;
               },
@@ -115,6 +115,9 @@ export default {
     return {};
   },
   methods: {
+    handlePlotClick(params) {
+      this.$emit("click", params);
+    },
   },
 };
 </script>

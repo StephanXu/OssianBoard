@@ -47,5 +47,12 @@ namespace Logger.Controllers
             [FromQuery(Name = "page")] int page,
             [FromQuery(Name = "items-per-page")] int itemsPerPage) =>
             _logService.GetLog(logId, page, itemsPerPage);
+
+        [HttpGet("{logId}/time-navigation")]
+        public RawLogNavigator GetLogByTime(
+            [FromRoute] string logId,
+            [FromQuery(Name = "time")] long time,
+            [FromQuery(Name = "items-per-page")] int itemsPerPage) =>
+            _logService.GetLogByTime(logId, itemsPerPage, DateTimeOffset.FromUnixTimeMilliseconds(time).DateTime);
     }
 }

@@ -109,4 +109,10 @@ namespace Logger.Models
         [Key("records")] public List<RecordModel> Records { get; set; }
         [Key("plots")] public List<PlotRequest> Plots { get; set; }
     }
+
+    public class RawLogNavigator
+    {
+        public int Page { get; set; }
+        public IEnumerable<RecordModel> Records { get; set; }
+    }
 }
