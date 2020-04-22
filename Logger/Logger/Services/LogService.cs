@@ -59,18 +59,28 @@ namespace Logger.Services
                 return null;
             }
 
-            var recordList = _recordCollection
-                .AsQueryable()
-                .Where(item => item.LogId == logId)
-                .OrderByDescending(item => item.Time)
-                .ToList();
-            var recordIndex = recordList.FindIndex(item => item.Time == time);
-            return recordIndex == -1
+            var record = _recordCollection.Aggregate()
+                .Match(item => item.LogId == logId)
+                .SortByDescending(item => item.Time)
+                .Group(item => false, item => new
+                {
+                    RecordTime = item.Select(curtRecord => curtRecord.Time)
+                })
+                .Unwind(item => item.RecordTime, new AggregateUnwindOptions<UnwindResult>
+                {
+                    IncludeArrayIndex = "Index",
+                    PreserveNullAndEmptyArrays = false
+                })
+                .Match(item => item.RecordTime == time)
+                .Limit(1)
+                .FirstOrDefault();
+
+            return record == null
                 ? null
                 : new RawLogNavigator
                 {
-                    Page = recordIndex / itemsPerPage + 1,
-                    Records = GetLog(logId, recordIndex / itemsPerPage + 1, itemsPerPage)
+                    Page = record.Index / itemsPerPage + 1,
+                    Records = GetLog(logId, record.Index / itemsPerPage + 1, itemsPerPage)
                 };
         }
 

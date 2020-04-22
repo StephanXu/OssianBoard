@@ -53,6 +53,6 @@ namespace Logger.Controllers
             [FromRoute] string logId,
             [FromQuery(Name = "time")] long time,
             [FromQuery(Name = "items-per-page")] int itemsPerPage) =>
-            _logService.GetLogByTime(logId, itemsPerPage, DateTimeOffset.FromUnixTimeMilliseconds(time).DateTime);
+            _logService.GetLogByTime(logId, itemsPerPage, DateTimeOffset.FromUnixTimeMilliseconds(time).UtcDateTime);
     }
 }

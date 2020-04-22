@@ -127,11 +127,15 @@ export default {
       this.logMeta.recordCount += increment.records.length;
       if (this.currentPage == 1) {
         if (increment.records.length >= this.itemsPerPage) {
-          this.logs = increment.records.slice(0, this.itemsPerPage);
+          this.logs = this.processLogs(
+            increment.records.slice(0, this.itemsPerPage)
+          );
         } else {
-          this.logs = this.logs
-            .slice(0, this.itemsPerPage - increment.records.length)
-            .concat(increment.records);
+          this.logs = this.processLogs(
+            this.logs
+              .slice(0, this.itemsPerPage - increment.records.length)
+              .concat(increment.records)
+          );
         }
       }
     });
@@ -231,7 +235,9 @@ export default {
       this.loading = true;
       this.currentPage = page;
       this.itemsPerPage = itemsPerPage;
-      this.logs = await getLog(this.logId, page, itemsPerPage);
+      this.logs = this.processLogs(
+        await getLog(this.logId, page, itemsPerPage)
+      );
       this.loading = false;
     },
     async handlePlotClick({ data }) {
@@ -242,8 +248,17 @@ export default {
         this.itemsPerPage
       );
       this.currentPage = page;
-      this.logs = records;
+      this.logs = this.processLogs(records);
       this.loading = false;
+    },
+    processLogs(logs) {
+      return logs.map((item) => {
+        let time = new Date(item.time);
+        return {
+          ...item,
+          time: `${time.toLocaleString()}.${time.getMilliseconds()}`,
+        };
+      });
     },
   },
 };

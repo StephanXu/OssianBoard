@@ -115,4 +115,11 @@ namespace Logger.Models
         public int Page { get; set; }
         public IEnumerable<RecordModel> Records { get; set; }
     }
+
+    public class UnwindResult
+    {
+        public bool Id { get; set; }
+        public DateTime RecordTime { get; set; }
+        public int Index { get; set; }
+    }
 }
