@@ -44,7 +44,7 @@
     </v-app-bar>
 
     <v-content>
-      <transition name="scroll-x-reverse-transition" mode="out-in">
+      <transition name="slide-fade" mode="out-in">
         <router-view :key="key" />
       </transition>
     </v-content>
@@ -60,10 +60,10 @@ import { mapGetters } from "vuex";
 import DefaultNavigator from "./DefaultNavigator";
 export default {
   components: {
-    DefaultNavigator
+    DefaultNavigator,
   },
   props: {
-    source: String
+    source: String,
   },
   data: () => ({
     drawer: null,
@@ -71,19 +71,19 @@ export default {
       {
         icon: "mdi-view-dashboard",
         title: "Arguments",
-        redirect: "/index"
+        redirect: "/index",
       },
       {
         icon: "mdi-chart-areaspline",
         title: "Online Logger",
-        redirect: "/board"
+        redirect: "/board",
       },
       {
         icon: "mdi-account",
         title: "Profile",
-        redirect: "/profile"
-      }
-    ]
+        redirect: "/profile",
+      },
+    ],
   }),
   computed: {
     ...mapGetters("user", ["name", "alias"]),
@@ -92,12 +92,29 @@ export default {
     },
     currentNavigatorDrawer() {
       return this.$route.meta.drawer;
-    }
+    },
   },
   methods: {
     switchTheme() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
-    }
-  }
+    },
+  },
 };
 </script>
+
+<style scoped>
+.slide-fade-enter-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-leave-active {
+  transition: all 0.1s ease;
+}
+.slide-fade-enter {
+  transform: translateX(10px);
+  opacity: 0;
+}
+.slide-fade-leave-to {
+  transform: translateX(-10px);
+  opacity: 0;
+}
+</style>

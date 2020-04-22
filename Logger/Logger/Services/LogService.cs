@@ -21,6 +21,7 @@ namespace Logger.Services
         public Task<LogModel> CreateLog(string name, string description);
         public IEnumerable<LogModel> ListLogs();
         public LogModel GetLogMeta(string logId);
+        public Task UpdateLogMeta(string logId, string name, string description);
         public Task<IncrementRequest> AddRecord(string logId, IEnumerable<string> record);
         public Task<LogModel> RemoveLog(string logId);
     }
@@ -137,7 +138,22 @@ namespace Logger.Services
                 .Where(item => true);
 
         public LogModel GetLogMeta(string logId) =>
-            _logCollection.AsQueryable().First(item => item.Id == logId);
+            _logCollection.AsQueryable().FirstOrDefault(item => item.Id == logId);
+
+        public async Task UpdateLogMeta(string logId, string name, string description)
+        {
+            var log = _logCollection
+                .AsQueryable()
+                .FirstOrDefault(item => item.Id == logId);
+            if (log == null)
+            {
+                return;
+            }
+
+            log.Name = name;
+            log.Description = description;
+            await _logCollection.ReplaceOneAsync(item => item.Id == logId, log);
+        }
 
         public async Task<IncrementRequest> AddRecord(string logId, IEnumerable<string> record)
         {

@@ -30,13 +30,16 @@ namespace Logger.Controllers
         public IEnumerable<LogModel> GetLogList() => _logService.ListLogs();
 
         [HttpDelete("{logId}")]
-        public async Task RemoveLog(string logId)
+        public async Task RemoveLog([FromRoute] string logId)
         {
             await _logService.RemoveLog(logId);
-            await _logViewerHub.Clients.All.SendAsync(
-                "RefreshLogsList",
-                _logService.ListLogs());
         }
+
+        [HttpPut("{logId}")]
+        public async Task UpdateLog(
+            [FromRoute] string logId,
+            [FromBody] UpdateLogRequestModel model) =>
+            await _logService.UpdateLogMeta(logId, model.Name, model.Description);
 
         [HttpGet("{logId}/plot")]
         public IEnumerable<PlotRequest> GetPlots(string logId) => _logService.GetPlots(logId);

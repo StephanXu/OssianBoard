@@ -7,6 +7,20 @@ export function getLogList() {
     })
 }
 
+export function updateLog(logId, {
+    name,
+    description
+}) {
+    return request({
+        url: `/log/${logId}`,
+        method: 'put',
+        data: {
+            name,
+            description
+        }
+    })
+}
+
 export function removeLog(logId) {
     return request({
         url: `log/${logId}`,

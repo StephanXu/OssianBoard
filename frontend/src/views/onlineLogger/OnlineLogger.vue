@@ -109,41 +109,46 @@ export default {
     },
   },
   async created() {
-    if (this.isEmptyId) {
-      return;
-    }
-    if (!this.connectionStatus) {
-      await this.$store.dispatch("log/connect");
-    }
-
-    let logMetaCache = this.logList.find((item) => item.id === this.logId);
-    this.logMeta =
-      logMetaCache == null
-        ? await this.connection.invoke("GetLogMeta", this.logId)
-        : logMetaCache;
-
-    this.connection.on("ReceiveLog", (increment) => {
-      this.mergePlot(increment.plots);
-      this.logMeta.recordCount += increment.records.length;
-      if (this.currentPage == 1) {
-        if (increment.records.length >= this.itemsPerPage) {
-          this.logs = this.processLogs(
-            increment.records.slice(0, this.itemsPerPage)
-          );
-        } else {
-          this.logs = this.processLogs(
-            this.logs
-              .slice(0, this.itemsPerPage - increment.records.length)
-              .concat(increment.records)
-          );
-        }
+    this.$nextTick(async () => {
+      if (this.isEmptyId) {
+        return;
       }
-    });
-    this.loading = true;
-    this.connection.invoke("ListenLog", this.logId);
-    this.connection.invoke("GetPlots", this.logId).then((res) => {
-      this.mergePlot(res);
-      this.loading = false;
+      if (!this.connectionStatus) {
+        await this.$store.dispatch("log/connect");
+      }
+
+      let logMetaCache = this.logList.find((item) => item.id === this.logId);
+      this.logMeta =
+        logMetaCache == null
+          ? await this.connection.invoke("GetLogMeta", this.logId)
+          : logMetaCache;
+      if (this.logMeta == null) {
+        this.$router.push({ path: "/board/index" });
+      }
+
+      this.connection.on("ReceiveLog", (increment) => {
+        this.mergePlot(increment.plots);
+        this.logMeta.recordCount += increment.records.length;
+        if (this.currentPage == 1) {
+          if (increment.records.length >= this.itemsPerPage) {
+            this.logs = this.processLogs(
+              increment.records.slice(0, this.itemsPerPage)
+            );
+          } else {
+            this.logs = this.processLogs(
+              this.logs
+                .slice(0, this.itemsPerPage - increment.records.length)
+                .concat(increment.records)
+            );
+          }
+        }
+      });
+      this.loading = true;
+      this.connection.invoke("ListenLog", this.logId);
+      this.connection.invoke("GetPlots", this.logId).then((res) => {
+        this.mergePlot(res);
+        this.loading = false;
+      });
     });
   },
   async destroyed() {
