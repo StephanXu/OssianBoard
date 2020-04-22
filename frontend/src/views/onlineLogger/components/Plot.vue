@@ -1,5 +1,10 @@
 <template>
-  <v-chart autoresize :options="option" @click="handlePlotClick" />
+  <v-chart
+    autoresize
+    :options="option"
+    @click="handlePlotClick"
+    :theme="$vuetify.theme.dark ? 'material-dark' : ''"
+  />
 </template>
 
 <script>
@@ -10,7 +15,7 @@ import "echarts/lib/component/dataZoom";
 import "echarts/lib/component/tooltip";
 import "echarts/lib/component/toolbox";
 
-// import echarts from "echarts/lib/echarts";
+import "./material-dark-theme";
 
 export default {
   props: {

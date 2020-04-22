@@ -42,7 +42,7 @@
         <v-card class="mx-auto" tle>
           <v-card-title>{{ item.name }}</v-card-title>
           <plot
-            style="height: 500px; width: 100%;"
+            style="height: 550px; width: 100%; padding-bottom:50px"
             :values="item.variables"
             @click="handlePlotClick"
           ></plot>
