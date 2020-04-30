@@ -33,6 +33,7 @@ namespace Logger.Services
         private readonly IMongoCollection<PlotModel> _plotCollection;
         private readonly IMongoCollection<VariableModel> _variableCollection;
         private readonly IMongoCollection<DotModel> _dotCollection;
+        private readonly IMongoCollection<ConfigurationModel> _archiveConfig;
 
         public LogService(IConfiguration config)
         {
@@ -43,6 +44,7 @@ namespace Logger.Services
             _plotCollection = database.GetCollection<PlotModel>("plots");
             _variableCollection = database.GetCollection<VariableModel>("variables");
             _dotCollection = database.GetCollection<DotModel>("dots");
+            _archiveConfig = database.GetCollection<ConfigurationModel>("archiveConfig");
         }
 
         public IEnumerable<RecordModel> GetLog(string logId, int page, int itemsPerPage) =>
@@ -287,6 +289,7 @@ namespace Logger.Services
             await _variableCollection.DeleteManyAsync(item => item.LogId == logId);
             await _plotCollection.DeleteManyAsync(item => item.LogId == logId);
             await _logCollection.DeleteOneAsync(item => item.Id == log.Id);
+            await _archiveConfig.DeleteOneAsync(item => item.LogId == log.Id);
             return log;
         }
     }

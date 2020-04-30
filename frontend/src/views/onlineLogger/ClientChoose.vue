@@ -42,6 +42,7 @@
       :position-y="menuPosY"
       absolute
       offset-y
+      transition="slide-y-transition"
     >
       <v-list dense>
         <v-list-item @click="handleEditLog">

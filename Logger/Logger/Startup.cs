@@ -40,8 +40,9 @@ namespace Logger
                 .AddMessagePackProtocol()
                 .AddJsonProtocol();
             services.AddScoped<UserService>();
-            services.AddScoped<ArgumentService>();
+            services.AddSingleton<IArgumentsService, ArgumentsService>();
             services.AddSingleton<ILogService, LogService>();
+            services.AddGrpc(option => { option.EnableDetailedErrors = true; });
             
             var key = Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings")["Secret"]);
             services.AddAuthentication(option =>
@@ -82,21 +83,12 @@ namespace Logger
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors(builder =>
-            {
-                builder.WithOrigins(
-                        "http://192.168.1.6/",
-                        "http://localhost:8080",
-                        "http://localhost:5000")
-                    .AllowAnyHeader()
-                    .WithMethods("GET", "POST")
-                    .AllowCredentials();
-            });
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
@@ -109,6 +101,8 @@ namespace Logger
                 endpoints.MapControllers();
                 endpoints.MapHub<LoggerHub>("/logger");
                 endpoints.MapHub<LogViewerHub>("/log-viewer");
+                endpoints.MapGrpcService<ConfigurationServiceImpl>();
+                endpoints.MapGrpcService<OnlineLogServiceImpl>();
             });
         }
     }

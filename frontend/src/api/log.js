@@ -56,3 +56,10 @@ export function getLogByTime(logId, time, itemsPerPage) {
         },
     })
 }
+
+export function getArchivedConfiguration(logId) {
+    return request({
+        url: `log/${logId}/config`,
+        method: 'get'
+    })
+}

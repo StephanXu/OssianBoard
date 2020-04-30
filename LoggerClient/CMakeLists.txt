@@ -7,3 +7,4 @@ project ("LoggerClient")
 
 # Include sub-projects.
 add_subdirectory ("LoggerClient")
+add_subdirectory("LoggerClientGRPC")

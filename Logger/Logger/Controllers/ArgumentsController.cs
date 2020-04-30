@@ -14,9 +14,9 @@ namespace Logger.Controllers
     [ApiController]
     public class ArgumentController : ControllerBase
     {
-        private readonly ArgumentService _siteSetting;
+        private readonly IArgumentsService _siteSetting;
         private readonly IHubContext<LoggerHub> _loggerHub;
-        public ArgumentController(ArgumentService siteSetting, IHubContext<LoggerHub> loggerHub)
+        public ArgumentController(IArgumentsService siteSetting, IHubContext<LoggerHub> loggerHub)
         {
             _siteSetting = siteSetting;
             _loggerHub = loggerHub;
@@ -25,12 +25,12 @@ namespace Logger.Controllers
         [HttpGet]
         [AllowAnonymous]
         public ActionResult GetSettings() =>
-            Ok(_siteSetting.Get().Arguments);
+            Ok(_siteSetting.GetArguments().Arguments);
 
         [HttpPut]
         public ActionResult UpdateSettings(ArgumentModel setting)
         {
-            _siteSetting.Update(setting);
+            _siteSetting.UpdateArguments(setting);
             _loggerHub.Clients.All.SendAsync("ReloadSettings", setting);
             return NoContent();
         }

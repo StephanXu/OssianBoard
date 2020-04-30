@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Logger.Services;
 using Logger.Models;
+using Logger.Protos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -18,11 +19,16 @@ namespace Logger.Controllers
     public class LogController : ControllerBase
     {
         private readonly ILogService _logService;
+        private readonly IArgumentsService _argumentsService;
         private readonly IHubContext<LogViewerHub> _logViewerHub;
 
-        public LogController(ILogService logService, IHubContext<LogViewerHub> logViewerHub)
+        public LogController(
+            ILogService logService,
+            IArgumentsService argumentsService,
+            IHubContext<LogViewerHub> logViewerHub)
         {
             _logService = logService;
+            _argumentsService = argumentsService;
             _logViewerHub = logViewerHub;
         }
 
@@ -57,5 +63,9 @@ namespace Logger.Controllers
             [FromQuery(Name = "time")] long time,
             [FromQuery(Name = "items-per-page")] int itemsPerPage) =>
             _logService.GetLogByTime(logId, itemsPerPage, DateTimeOffset.FromUnixTimeMilliseconds(time).UtcDateTime);
+
+        [HttpGet("{logId}/config")]
+        public Configuration GetArchivedConfiguration([FromRoute] string logId) =>
+            _argumentsService.GetArchivedArguments(logId);
     }
 }

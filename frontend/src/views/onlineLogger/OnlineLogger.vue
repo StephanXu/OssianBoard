@@ -3,49 +3,75 @@
     <v-row align="center" justify="center">
       <v-col cols="12">
         <v-card v-if="!isEmptyId">
-          <v-data-table
-            fixed-header
-            dense
-            calculate-widths
-            :headers="logTableHeader"
-            :items="logs"
-            item-key="id"
-            :server-items-length="logMeta.recordCount"
-            :items-per-page="itemsPerPage"
-            :page="currentPage"
-            @pagination="handlePagination"
-            :loading="loading"
-          >
-            <template v-slot:top>
-              <v-toolbar flat>
-                <v-toolbar-title>Raw log</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-switch
-                  v-model="prettier"
-                  label="Prettier"
-                  class="mt-2"
-                  disabled
-                ></v-switch>
-              </v-toolbar>
-            </template>
-            <template v-slot:item.level="{ item }">
-              <v-chip x-small :color="getLogColor(item.level)" dark>
-                {{ item.level }}</v-chip
-              >
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row v-for="item in figures" :key="item.name">
-      <v-col cols="12">
-        <v-card class="mx-auto" tle>
-          <v-card-title>{{ item.name }}</v-card-title>
-          <plot
-            style="height: 550px; width: 100%; padding-bottom:50px"
-            :values="item.variables"
-            @click="handlePlotClick"
-          ></plot>
+          <v-row no-gutters>
+            <v-col cols="12">
+              <v-card flat>
+                <v-tabs v-model="activePlot" right grow>
+                  <v-tab v-for="item in figures" :key="item.name">
+                    {{ item.name }}
+                  </v-tab>
+                </v-tabs>
+                <plot
+                  style="height: 550px; width: 100%; padding-bottom:50px"
+                  :values="figures[activePlot].variables"
+                  @click="handlePlotClick"
+                ></plot>
+              </v-card>
+            </v-col>
+          </v-row>
+          <v-divider />
+          <v-row no-gutters>
+            <v-col cols="12">
+              <v-card flat>
+                <v-data-table
+                  fixed-header
+                  dense
+                  calculate-widths
+                  :headers="logTableHeader"
+                  :items="logs"
+                  item-key="id"
+                  :server-items-length="logMeta.recordCount"
+                  :items-per-page="itemsPerPage"
+                  :page="currentPage"
+                  @pagination="handlePagination"
+                  :loading="loading"
+                >
+                  <template v-slot:top>
+                    <v-toolbar flat>
+                      <v-toolbar-title>Raw log</v-toolbar-title>
+                      <v-spacer></v-spacer>
+                      <v-switch
+                        v-model="prettier"
+                        label="Prettier"
+                        class="mt-2"
+                        disabled
+                      ></v-switch>
+                    </v-toolbar>
+                  </template>
+                  <template v-slot:item.level="{ item }">
+                    <v-chip x-small :color="getLogColor(item.level)" dark>
+                      {{ item.level }}
+                    </v-chip>
+                  </template>
+                </v-data-table>
+              </v-card>
+            </v-col>
+          </v-row>
+          <v-divider />
+          <v-row>
+            <v-col cols="12">
+              <v-card flat>
+                <v-card-title>Configuration</v-card-title>
+                <v-treeview
+                  dense
+                  transition
+                  :items="configTreeView"
+                  class="overflow-y-auto"
+                  style="height:250px"
+                ></v-treeview>
+              </v-card>
+            </v-col>
+          </v-row>
         </v-card>
       </v-col>
     </v-row>
@@ -55,7 +81,7 @@
 <script>
 import Plot from "./components/Plot";
 import { mapGetters } from "vuex";
-import { getLog, getLogByTime } from "@/api/log";
+import { getLog, getLogByTime, getArchivedConfiguration } from "@/api/log";
 export default {
   components: {
     Plot,
@@ -84,6 +110,7 @@ export default {
         { text: "Content", value: "content" },
       ],
       loading: false,
+      plotLoading: false,
       itemsPerPage: 10,
       currentPage: 1,
       logMeta: {
@@ -93,6 +120,8 @@ export default {
         name: "",
         recordCount: 0,
       },
+      activePlot: 0,
+      configurationData: {},
     };
   },
   computed: {
@@ -106,6 +135,13 @@ export default {
     },
     isEmptyId() {
       return this.logId == "index" || this.logId == "";
+    },
+    configTreeView() {
+      console.log(this.configTree(this.configurationData, 0));
+      return this.configTree(this.configurationData, 0);
+    },
+    haveConfigTreeView() {
+      return this.configurationData != {};
     },
   },
   async created() {
@@ -144,11 +180,15 @@ export default {
         }
       });
       this.loading = true;
+      this.plotLoading = true;
       this.connection.invoke("ListenLog", this.logId);
       this.connection.invoke("GetPlots", this.logId).then((res) => {
         this.mergePlot(res);
+        this.plotLoading = false;
         this.loading = false;
       });
+      this.configurationData = await getArchivedConfiguration(this.logId);
+      console.log(this.configurationData);
     });
   },
   async destroyed() {
@@ -264,6 +304,25 @@ export default {
           time: `${time.toLocaleString()}.${time.getMilliseconds()}`,
         };
       });
+    },
+    configTree(config, idCount) {
+      let res = [];
+      for (const property in config) {
+        ++idCount;
+        if (typeof config[property] === "object") {
+          res.push({
+            id: idCount,
+            name: property,
+            children: this.configTree(config[property], idCount),
+          });
+        } else {
+          res.push({
+            id: idCount,
+            name: `${property}: ${config[property]}`,
+          });
+        }
+      }
+      return res;
     },
   },
 };
