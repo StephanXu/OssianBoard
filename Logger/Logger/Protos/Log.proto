@@ -4,8 +4,6 @@ option csharp_namespace = "Logger.Protos";
 
 package OssianConfig;
 
-import "Config.proto";
-
 message CreateLogRequest {
 	string name = 1;
 	string description = 2;

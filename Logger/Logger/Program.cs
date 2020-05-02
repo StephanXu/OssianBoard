@@ -27,7 +27,10 @@ namespace Logger
                         option.ListenAnyIP(5000, o =>
                         {
                             o.Protocols = HttpProtocols.Http1AndHttp2;
-                            o.UseHttps("debug.fenzhengrou.wang.pfx", "159357");
+                        });
+                        option.ListenAnyIP(5001, o =>
+                        {
+                            o.Protocols = HttpProtocols.Http2;
                         });
                     });
                     webBuilder.UseStartup<Startup>();

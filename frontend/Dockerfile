@@ -9,3 +9,5 @@ RUN npm run build
 FROM nginx:1.17.8-alpine AS final
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+EXPOSE 80
+EXPOSE 90
