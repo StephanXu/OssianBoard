@@ -81,7 +81,10 @@ router.beforeEach(async (to, from, next) => {
         path: '/'
       })
     } else {
-      await store.dispatch('user/getInfo')
+      let hasRole = store.getters['user/roles'] && store.getters['user/roles'].length > 0
+      if (!hasRole) {
+        await store.dispatch('user/getInfo')
+      }
       next()
     }
   } else {

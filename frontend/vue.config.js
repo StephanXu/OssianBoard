@@ -7,12 +7,12 @@ module.exports = {
   devServer: {
     proxy: {
       '^/log-viewer': {
-        target: 'https://localhost:5000',
+        target: 'http://localhost:5000',
         ws: true,
         changeOrigin: true
       },
       '^/api': {
-        target: 'https://localhost:5000'
+        target: 'http://localhost:5000'
       }
     }
   }

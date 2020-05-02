@@ -6,7 +6,7 @@
           <v-row no-gutters>
             <v-col cols="12">
               <v-card flat>
-                <v-tabs v-model="activePlot" right grow>
+                <v-tabs v-model="activePlot" grow>
                   <v-tab v-for="item in figures" :key="item.name">
                     {{ item.name }}
                   </v-tab>
@@ -137,7 +137,6 @@ export default {
       return this.logId == "index" || this.logId == "";
     },
     configTreeView() {
-      console.log(this.configTree(this.configurationData, 0));
       return this.configTree(this.configurationData, 0);
     },
     haveConfigTreeView() {
@@ -188,7 +187,6 @@ export default {
         this.loading = false;
       });
       this.configurationData = await getArchivedConfiguration(this.logId);
-      console.log(this.configurationData);
     });
   },
   async destroyed() {
@@ -274,7 +272,11 @@ export default {
       return "";
     },
     async handlePagination({ page, itemsPerPage }) {
-      if (this.currentPage == page && this.logs.length != 0) {
+      if (
+        this.currentPage == page &&
+        itemsPerPage == this.itemsPerPage &&
+        this.logs.length != 0
+      ) {
         return;
       }
       this.loading = true;

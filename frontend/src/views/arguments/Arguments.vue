@@ -46,34 +46,34 @@
     </v-dialog>
 
     <v-row align="center" justify="center">
-      <v-col align-self="start" :cols="12 / colum.length" v-for="col in colum" :key="col">
-        <v-card
-          v-for="cate in columTable(col, colum.length)"
-          :key="cate.alias"
-          style="padding:20px;margin-bottom:20px;max-width: 850px"
-          class="mx-auto"
-          tle
-        >
-          <v-card-title>{{ cate.alias }}</v-card-title>
-          <div v-for="item in cate.child" :key="item.alias">
-            <v-text-field
-              v-if="item.type === 'input'"
-              :label="item.alias"
-              v-model="form[cate.alias][item.alias]"
-            />
-            <v-switch
-              v-else-if="item.type === 'bool'"
-              v-model="form[cate.alias][item.alias]"
-              :label="item.alias"
-            ></v-switch>
-            <v-select
-              v-else-if="item.type === 'enum'"
-              v-model="form[cate.alias][item.alias]"
-              :items="item.values"
-              :label="item.alias"
-            ></v-select>
-          </div>
-        </v-card>
+      <v-col cols="12" md="6">
+        <v-expansion-panels multiple>
+          <v-expansion-panel v-for="(cate, index) in table" :key="index">
+            <v-expansion-panel-header>
+              {{ cate.alias }}
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <div v-for="item in cate.child" :key="item.alias">
+                <v-text-field
+                  v-if="item.type === 'input'"
+                  :label="item.alias"
+                  v-model="form[cate.alias][item.alias]"
+                />
+                <v-switch
+                  v-else-if="item.type === 'bool'"
+                  v-model="form[cate.alias][item.alias]"
+                  :label="item.alias"
+                ></v-switch>
+                <v-select
+                  v-else-if="item.type === 'enum'"
+                  v-model="form[cate.alias][item.alias]"
+                  :items="item.values"
+                  :label="item.alias"
+                ></v-select>
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-col>
     </v-row>
     <v-speed-dial
