@@ -210,12 +210,16 @@ export default {
             (item) => item.name === variable.name
           );
           if (variableIndex == -1) {
+            variable.dots.sort((lhs, rhs) => lhs.time - rhs.time);
             this.figures[plotIndex].variables.push(variable);
             return;
           }
           let dots = this.figures[plotIndex].variables[variableIndex].dots;
           this.figures[plotIndex].variables[variableIndex].dots = dots.concat(
             variable.dots
+          );
+          this.figures[plotIndex].variables[variableIndex].dots.sort(
+            (lhs, rhs) => lhs.time - rhs.time
           );
         });
       });

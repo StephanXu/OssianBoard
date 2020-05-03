@@ -108,6 +108,7 @@ namespace Logger.Services
                             .First(variable => variable.Id == varId).Name,
                         Dots = _dotCollection.AsQueryable()
                             .Where(dot => dot.VariableId == varId)
+                            .OrderBy(dot => dot.Time)
                             .Select(dot => new DotRequest
                             {
                                 Time = dot.Time,
