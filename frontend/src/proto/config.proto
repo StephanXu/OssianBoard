@@ -31,13 +31,13 @@ message Camera {
 }
 
 message TestVideoSource {
-	required string filename = 1;
+	 required string filename = 1;
 }
 
 message Aimbot {
 	enum EnemyColor {
-		Red = 2; // 红色敌人
 		Blue = 0; // 蓝色敌人
+		Red = 2; // 红色敌人
 	}
 	required EnemyColor enemyColor = 1;
 
@@ -78,6 +78,7 @@ message Chassis {
 	required double kTopWz = 1;
 	required double kVxFilterCoef = 2;
 	required double kVyFilterCoef = 3;
+	required double kRPMFdbFilterCoef = 4;
 } 
 
 message Gimbal {
