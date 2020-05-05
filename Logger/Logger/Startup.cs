@@ -42,6 +42,8 @@ namespace Logger
             services.AddScoped<UserService>();
             services.AddSingleton<IArgumentsService, ArgumentsService>();
             services.AddSingleton<ILogService, LogService>();
+            services.AddHostedService<QueuedHostedService>();
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddGrpc(option => { option.EnableDetailedErrors = true; });
             
             var key = Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings")["Secret"]);
@@ -87,8 +89,6 @@ namespace Logger
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseHttpsRedirection();
 
             app.UseRouting();
 

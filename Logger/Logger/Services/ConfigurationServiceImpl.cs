@@ -19,11 +19,9 @@ namespace Logger.Services
             _argumentsService = argumentsService;
         }
 
-        public override async Task<Configuration> GetConfiguration(GetConfigurationRequest request,
-            ServerCallContext context)
-        {
-            return Configuration.Parser.ParseJson(_argumentsService.GetArguments().Arguments);
-        }
+        public override async Task<Configuration> GetConfiguration
+            (GetConfigurationRequest request, ServerCallContext context) =>
+            Configuration.Parser.ParseJson(_argumentsService.GetArguments().Arguments);
 
         public override async Task<ArchiveConfigurationResponse> ArchiveConfiguration
             (ArchiveConfigurationRequest request, ServerCallContext context)

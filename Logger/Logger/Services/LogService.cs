@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DnsClient.Protocol;
 using Logger.Models;
 using Microsoft.AspNetCore.Routing.Patterns;
+using Microsoft.CodeAnalysis.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -160,7 +161,15 @@ namespace Logger.Services
 
         public async Task<IncrementRequest> AddRecord(string logId, IEnumerable<string> record)
         {
-            var log = (await _logCollection.FindAsync(item => item.Id == logId)).FirstOrDefault();
+            var log = _logCollection.AsQueryable().FirstOrDefault(item => item.Id == logId);
+            if (log == null)
+            {
+                return new IncrementRequest
+                {
+                    Plots = new List<PlotRequest>(),
+                    Records = new List<RecordModel>()
+                };
+            }
             var dots = new List<DotModel>(); // Cache for insertMany
             var incrementPlot = new List<PlotRequest>();
             var incrementRecord = new List<RecordModel>();

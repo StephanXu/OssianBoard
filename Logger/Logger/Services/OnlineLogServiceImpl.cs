@@ -14,15 +14,18 @@ namespace Logger.Services
         private readonly ILogService _logService;
         private readonly IArgumentsService _argumentsService;
         private readonly IHubContext<LogViewerHub> _logViewerHub;
+        private readonly IBackgroundTaskQueue _taskQueue;
 
         public OnlineLogServiceImpl(
             ILogService logService,
             IArgumentsService argumentsService,
-            IHubContext<LogViewerHub> logViewerHub)
+            IHubContext<LogViewerHub> logViewerHub,
+            IBackgroundTaskQueue taskQueue)
         {
             _logService = logService;
             _argumentsService = argumentsService;
             _logViewerHub = logViewerHub;
+            _taskQueue = taskQueue;
         }
 
         public override async Task<CreateLogResponse> CreateLog(CreateLogRequest request, ServerCallContext context)
@@ -40,9 +43,12 @@ namespace Logger.Services
 
         public override async Task<AddLogResponse> AddLog(AddLogRequest request, ServerCallContext context)
         {
-            var increment = await _logService.AddRecord(request.LogId, request.Log);
-            await _logViewerHub.Clients.Group($"Listen{request.LogId}")
-                .SendAsync("ReceiveLog", increment);
+            _taskQueue.QueueBackgroundWorkItem(async token =>
+            {
+                var increment = await _logService.AddRecord(request.LogId, request.Log);
+                await _logViewerHub.Clients.Group($"Listen{request.LogId}")
+                    .SendAsync("ReceiveLog", increment);
+            });
             return new AddLogResponse();
         }
     }
