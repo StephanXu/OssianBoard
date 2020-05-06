@@ -82,7 +82,7 @@ message Chassis {
 } 
 
 message Gimbal {
-
+	required double kAngleSpeedFilterCoef = 1;
 }
 
 message Gun {
