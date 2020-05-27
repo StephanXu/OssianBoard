@@ -141,8 +141,22 @@ namespace Logger.Services
             _logCollection.AsQueryable()
                 .Where(item => true);
 
-        public LogModel GetLogMeta(string logId) =>
-            _logCollection.AsQueryable().FirstOrDefault(item => item.Id == logId);
+        public LogModel GetLogMeta(string logId)
+        {
+            var recordCount = _recordCollection
+                .AsQueryable()
+                .Count(item => item.LogId == logId);
+            return _logCollection.AsQueryable()
+                .Select(item => new LogModel
+                {
+                    CreateTime = item.CreateTime,
+                    Description = item.Description,
+                    Id = item.Id,
+                    Name = item.Name,
+                    RecordCount = recordCount
+                })
+                .FirstOrDefault(item => item.Id == logId);
+        }
 
         public async Task UpdateLogMeta(string logId, string name, string description)
         {
@@ -170,6 +184,7 @@ namespace Logger.Services
                     Records = new List<RecordModel>()
                 };
             }
+
             var dots = new List<DotModel>(); // Cache for insertMany
             var incrementPlot = new List<PlotRequest>();
             var incrementRecord = new List<RecordModel>();
