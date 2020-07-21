@@ -7,17 +7,17 @@ message SerialPort {
 	required string portName = 1;
 	required int32 baudrate = 2;
 	enum Parity {
-		NoParity = 0; // ÎŞĞ£Ñé
-		OddParity = 1; // ÆæĞ£Ñé
-		EvenParity = 2; // Å¼Ğ£Ñé
-		MarkParity = 3; // ±ê¼ÇĞ£Ñé
+		NoParity = 0; // æ— æ ¡éªŒ
+		OddParity = 1; // å¥‡æ ¡éªŒ
+		EvenParity = 2; // å¶æ ¡éªŒ
+		MarkParity = 3; // æ ‡è®°æ ¡éªŒ
 	}
 	required Parity parity = 3;
 	required int32 dataBit = 4;
 	enum StopBit {
-		OneStopBit = 0; // 1Î»Í£Ö¹Î»
-		One5StopBits = 1; // 1.5Î»Í£Ö¹Î»
-		TwoStopBits = 2; // 2Î»Í£Ö¹Î»
+		OneStopBit = 0; // 1ä½åœæ­¢ä½
+		One5StopBits = 1; // 1.5ä½åœæ­¢ä½
+		TwoStopBits = 2; // 2ä½åœæ­¢ä½
 	}
 	required StopBit stopBit = 5;
 	required bool synchronize = 6;
@@ -36,8 +36,8 @@ message TestVideoSource {
 
 message Aimbot {
 	enum EnemyColor {
-		Blue = 0; // À¶É«µĞÈË
-		Red = 2; // ºìÉ«µĞÈË
+		Blue = 0; // è“è‰²æ•Œäºº
+		Red = 2; // çº¢è‰²æ•Œäºº
 	}
 	required EnemyColor enemyColor = 1;
 
@@ -91,10 +91,10 @@ message Gun {
 	required int32 kFricSpeed18 = 3;
 	required int32 kFricSpeed30 = 4;
 
-	required int32 kFeedNormalRPM = 5;
-	required int32 kFeedSemiRPM = 6;
-	required int32 kFeedBurstRPM = 7;
-	required int32 kFeedAutoRPM = 8;
+	required int32 kFeedNormalSpeed = 5;
+	required int32 kFeedSemiSpeed = 6;
+	required int32 kFeedBurstSpeed = 7;
+	required int32 kFeedAutoSpeed = 8;
 }
 
 message PIDParams {
