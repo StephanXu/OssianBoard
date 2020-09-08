@@ -125,4 +125,5 @@ message Configuration {
 	required PIDParams pidFricSpeed = 17;
 	required PIDParams pidFeedAngle = 18;
 	required PIDParams pidFeedSpeed = 19;
+	required PIDParams pidAutoAimInput = 20;
 }
