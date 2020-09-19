@@ -1,85 +1,206 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Security.Policy;
 using MongoDB.Driver;
 using Logger.Models;
 using Microsoft.Extensions.Configuration;
 using Logger.Protos;
-using MongoDB.Driver.Linq;
+using Logger.Models;
 
 namespace Logger.Services
 {
     public interface IArgumentsService
     {
-        public ArgumentModel GetArguments();
-        public void UpdateArguments(ArgumentModel siteSetting);
-        public void InitArguments();
-        public void ArchiveArguments(string logId, Configuration config);
-        public Configuration GetArchivedArguments(string logId);
+        public ArgumentModel CreateArgument(
+            string name,
+            string schema,
+            string content);
+
+        public IEnumerable<ArgumentMeta> ListArguments();
+        public ArgumentModel GetSingleArgument(string argId);
+        public IEnumerable<ArgumentSnapshotMeta> ListSnapshot(string argId);
+        public ArgumentSnapshotModel GetSingleSnapshot(string snapshotId);
+        public void UpdateArguments(string argId, ArgumentModel argument);
+        public ArgumentSnapshotMeta CreateSnapshot(string argId, string name);
+        public void RemoveSnapshot(string snapshotId);
+        public void BindSnapshotForLog(string logId, string snapshotId);
+        public void UnbindSnapshotFromLogId(string logId);
+        public void RemoveArguments(string argId);
+        public ArgumentSnapshotModel GetSingleSnapshotFromLogId(string logId);
     }
 
     public class ArgumentsService : IArgumentsService
     {
-        private readonly IMongoCollection<ArgumentModel> _siteSetting;
-        private readonly IMongoCollection<ConfigurationModel> _archiveConfig;
+        private readonly IMongoCollection<ArgumentModel> _arguments;
+        private readonly IMongoCollection<ArgumentSnapshotModel> _snapshots;
+        private readonly IMongoCollection<LogWithArgumentSnapshot> _snapshotsWithLog;
         private readonly IMongoCollection<LogModel> _logCollection;
 
         public ArgumentsService(IConfiguration config)
         {
             var client = new MongoClient(config.GetConnectionString("OnlineLogger"));
             var database = client.GetDatabase("OnlineLogger");
-            _siteSetting = database.GetCollection<ArgumentModel>("arguments");
-            _archiveConfig = database.GetCollection<ConfigurationModel>("archiveConfig");
+            _arguments = database.GetCollection<ArgumentModel>("arguments");
+            _snapshots = database.GetCollection<ArgumentSnapshotModel>("argumentsSnapshots");
+            _snapshotsWithLog = database.GetCollection<LogWithArgumentSnapshot>("arguments");
             _logCollection = database.GetCollection<LogModel>("logs");
+        }
 
-            if (_siteSetting.CountDocuments(item => true) != 1)
+        public ArgumentModel CreateArgument(
+            string name,
+            string schema,
+            string content)
+        {
+            var arg = new ArgumentModel
             {
-                InitArguments();
+                Content = content,
+                Schema = schema,
+                CreateTime = DateTime.Now,
+                Id = null,
+                Name = name
+            };
+
+            _arguments.InsertOne(arg);
+            return arg;
+        }
+
+        public IEnumerable<ArgumentMeta> ListArguments() =>
+            _arguments.AsQueryable()
+                .Select(item => new ArgumentMeta
+                {
+                    Id = item.Id,
+                    CreateTime = item.CreateTime,
+                    Name = item.Name
+                });
+
+        public ArgumentModel GetSingleArgument(string argId) =>
+            _arguments.AsQueryable()
+                .FirstOrDefault(argument => argument.Id == argId);
+
+        public IEnumerable<ArgumentSnapshotMeta> ListSnapshot(string argId) =>
+            _snapshots.AsQueryable()
+                .Where(item => item.ArgumentId == argId)
+                .Select(item => new ArgumentSnapshotMeta
+                {
+                    Id = item.Id,
+                    CreateTime = item.CreateTime,
+                    Name = item.Name,
+                    Tag = item.Tag
+                });
+
+        public ArgumentSnapshotModel GetSingleSnapshot(string snapshotId) =>
+            _snapshots.AsQueryable()
+                .FirstOrDefault(snapshot => snapshot.Id == snapshotId);
+
+        public void UpdateArguments(string argId, ArgumentModel argument)
+        {
+            _arguments.ReplaceOne(item => true, argument);
+        }
+
+        public ArgumentSnapshotMeta CreateSnapshot(string argId, string name)
+        {
+            var arg = _arguments.AsQueryable().FirstOrDefault(argument => argument.Id == argId);
+            if (arg == null)
+            {
+                throw new ArgumentException("Argument not exists");
             }
-        }
 
-        public ArgumentModel GetArguments() =>
-            _siteSetting.Find(item => true).ToList()[0];
-
-        public void UpdateArguments(ArgumentModel siteSetting)
-        {
-            if (siteSetting.Id == null)
-            {
-                siteSetting.Id = GetArguments().Id;
-            }
-
-            _siteSetting.ReplaceOne(item => true, siteSetting);
-        }
-
-        public void InitArguments()
-        {
-            _siteSetting.DeleteMany(item => true);
-            _siteSetting.InsertOne(new ArgumentModel
-            {
-                Arguments = ""
-            });
-        }
-
-        public void ArchiveArguments(string logId, Configuration config)
-        {
-            var configuration = new ConfigurationModel
+            var snapshot = new ArgumentSnapshotModel
             {
                 Id = null,
-                LogId = logId,
-                Config = config
+                ArgumentId = arg.Id,
+                Content = arg.Content,
+                CreateTime = DateTime.Now,
+                Name = name,
+                Tag = null
             };
-            if (_logCollection.Find(item => item.Id == logId).FirstOrDefault() == null)
-            {
-                return;
-            }
 
-            _archiveConfig.InsertOne(configuration);
+            _snapshots.InsertOne(snapshot);
+
+            return new ArgumentSnapshotMeta
+            {
+                CreateTime = snapshot.CreateTime,
+                Id = snapshot.Id,
+                Name = snapshot.Name,
+                Tag = snapshot.Tag
+            };
         }
 
-        public Configuration GetArchivedArguments(string logId)
+        public void RemoveSnapshot(string snapshotId)
         {
-            var config = _archiveConfig.AsQueryable()
-                .Where(item => item.LogId == logId)
-                .FirstOrDefault();
-            return config == null ? null : config.Config;
+            var snapshot = _snapshots.AsQueryable()
+                .FirstOrDefault(item => item.Id == snapshotId);
+            if (null == snapshot)
+            {
+                throw new Exception("Snapshot did not exist");
+            }
+
+            _snapshotsWithLog.DeleteMany(item => item.ArgumentSnapshotId == snapshotId);
+            _snapshots.DeleteOne(item => item.Id == snapshotId);
+        }
+
+        public void BindSnapshotForLog(string logId, string snapshotId)
+        {
+            if (0 == _logCollection.AsQueryable().Count(log => log.Id == logId))
+            {
+                throw new Exception("Log not exists");
+            }
+
+            if (0 == _snapshots.AsQueryable().Count(snapshot => snapshot.Id == snapshotId))
+            {
+                throw new Exception("Argument not exists");
+            }
+
+            if (null != _snapshotsWithLog.AsQueryable().FirstOrDefault(item => item.LogId == logId))
+            {
+                throw new Exception("Log has already binded to a snapshot");
+            }
+
+            var relation = new LogWithArgumentSnapshot
+            {
+                ArgumentSnapshotId = snapshotId,
+                LogId = logId,
+                Id = null
+            };
+            _snapshotsWithLog.InsertOne(relation);
+        }
+
+        public void UnbindSnapshotFromLogId(string logId)
+        {
+            _snapshotsWithLog.DeleteMany(item => item.LogId == logId);
+        }
+        
+        public void RemoveArguments(string argId)
+        {
+            var arg = _arguments.AsQueryable()
+                .FirstOrDefault(item => item.Id == argId);
+            if (null == arg)
+            {
+                throw new Exception("Argument did not exist");
+            }
+
+            var snapshotIds = _snapshots.AsQueryable()
+                .Where(item => item.ArgumentId == argId)
+                .Select(item => item.Id);
+            _snapshotsWithLog.DeleteMany(item => snapshotIds.Contains(item.ArgumentSnapshotId));
+            _snapshots.DeleteMany(item => item.ArgumentId == argId);
+            _arguments.DeleteOne(item => item.Id == argId);
+        }
+
+        public ArgumentSnapshotModel GetSingleSnapshotFromLogId(string logId)
+        {
+            var relation = _snapshotsWithLog.AsQueryable()
+                .FirstOrDefault(item => item.LogId == logId);
+            if (null == relation)
+            {
+                return null;
+            }
+            var snapshot = _snapshots.AsQueryable()
+                .FirstOrDefault(item => item.Id == relation.ArgumentSnapshotId);
+            return snapshot;
         }
     }
 }

@@ -101,7 +101,6 @@ namespace Logger
                 endpoints.MapControllers();
                 endpoints.MapHub<LoggerHub>("/logger");
                 endpoints.MapHub<LogViewerHub>("/log-viewer");
-                endpoints.MapGrpcService<ConfigurationServiceImpl>();
                 endpoints.MapGrpcService<OnlineLogServiceImpl>();
             });
         }

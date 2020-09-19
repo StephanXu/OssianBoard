@@ -19,10 +19,5 @@
     <PackageReference Include="MongoDB.Driver" Version="2.10.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Protobuf Include="Protos\Config.proto" GrpcServices="Server" ProtoCompile="true" ProtoRoot="Protos" />
-    <Protobuf Include="Protos\Log.proto" GrpcServices="Server" ProtoCompile="true" ProtoRoot="Protos" />
-  </ItemGroup>
-
 
 </Project>

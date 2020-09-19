@@ -14,25 +14,79 @@ namespace Logger.Controllers
     [ApiController]
     public class ArgumentController : ControllerBase
     {
-        private readonly IArgumentsService _siteSetting;
+        private readonly IArgumentsService _argumentsService;
         private readonly IHubContext<LoggerHub> _loggerHub;
-        public ArgumentController(IArgumentsService siteSetting, IHubContext<LoggerHub> loggerHub)
+
+        public ArgumentController(IArgumentsService argumentsService, IHubContext<LoggerHub> loggerHub)
         {
-            _siteSetting = siteSetting;
+            _argumentsService = argumentsService;
             _loggerHub = loggerHub;
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public ActionResult GetSettings() =>
-            Ok(_siteSetting.GetArguments().Arguments);
+        public ActionResult ListArguments() => Ok(_argumentsService.ListArguments());
 
-        [HttpPut]
-        public ActionResult UpdateSettings(ArgumentModel setting)
+        [HttpGet("{argId}")]
+        [AllowAnonymous]
+        public ActionResult GetSingleArgument([FromRoute] string argId) =>
+            Ok(_argumentsService.GetSingleArgument(argId));
+
+        [HttpGet("{argId}/snapshot")]
+        public ActionResult ListSnapshot([FromRoute] string argId) =>
+            Ok(_argumentsService.ListSnapshot(argId));
+
+        [HttpGet("snapshot/{snapshotId}")]
+        [AllowAnonymous]
+        public ActionResult GetSingleSnapshot([FromRoute] string snapshotId) =>
+            Ok(_argumentsService.GetSingleSnapshot(snapshotId));
+
+        [HttpPut("{argId}")]
+        public ActionResult UpdateArgumentContent([FromRoute] string argId, [FromBody] ArgumentUpdateRequest argument)
         {
-            _siteSetting.UpdateArguments(setting);
-            _loggerHub.Clients.All.SendAsync("ReloadSettings", setting);
+            var arg = _argumentsService.GetSingleArgument(argId);
+            if (arg == null)
+            {
+                return NotFound();
+            }
+
+            arg.Content = argument.Content;
+            _argumentsService.UpdateArguments(argId, arg);
+            _loggerHub.Clients.All.SendAsync("ReloadSettings", argument.Content);
             return NoContent();
+        }
+
+        [HttpPost]
+        public ActionResult CreateArgument(CreateArgumentRequest createRequest) =>
+            Ok(_argumentsService.CreateArgument(createRequest.Name, createRequest.Schema, createRequest.Content));
+
+        [HttpPost("{argId}/snapshot")]
+        [AllowAnonymous]
+        public ActionResult CreateSnapshot(
+            [FromRoute] string argId,
+            [FromBody] CreateSnapshotRequest createRequest,
+            [FromQuery] string logId)
+        {
+            var snapshot = _argumentsService.CreateSnapshot(argId, createRequest.Name);
+            if (logId != null)
+            {
+                _argumentsService.BindSnapshotForLog(logId, snapshot.Id);
+            }
+
+            return Ok(snapshot);
+        }
+
+        [HttpDelete("snapshot/{snapshotId}")]
+        public ActionResult DeleteSnapshot([FromRoute] string snapshotId)
+        {
+            _argumentsService.RemoveSnapshot(snapshotId);
+            return Ok();
+        }
+
+        [HttpDelete("{argId}")]
+        public ActionResult DeleteArgument([FromRoute] string argId)
+        {
+            _argumentsService.RemoveArguments(argId);
+            return Ok();
         }
     }
 }

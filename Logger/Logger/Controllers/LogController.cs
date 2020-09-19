@@ -64,8 +64,8 @@ namespace Logger.Controllers
             [FromQuery(Name = "items-per-page")] int itemsPerPage) =>
             _logService.GetLogByTime(logId, itemsPerPage, DateTimeOffset.FromUnixTimeMilliseconds(time).UtcDateTime);
 
-        [HttpGet("{logId}/config")]
-        public Configuration GetArchivedConfiguration([FromRoute] string logId) =>
-            _argumentsService.GetArchivedArguments(logId);
+        [HttpGet("{logId}/argument")]
+        public ArgumentSnapshotModel GetArgumentSnapshot([FromRoute] string logId) =>
+            _argumentsService.GetSingleSnapshotFromLogId(logId);
     }
 }

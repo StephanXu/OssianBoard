@@ -19,16 +19,13 @@ namespace Logger.Hubs
     {
         private readonly ILogService _logService;
         private readonly IHubContext<LogViewerHub> _logViewerHub;
-        private readonly IArgumentsService _argumentsService;
 
         public LoggerHub(
             ILogService logService,
-            IHubContext<LogViewerHub> logViewerHub,
-            IArgumentsService argumentsService)
+            IHubContext<LogViewerHub> logViewerHub)
         {
             _logService = logService;
             _logViewerHub = logViewerHub;
-            _argumentsService = argumentsService;
         }
 
         public override async Task OnConnectedAsync()
@@ -54,12 +51,6 @@ namespace Logger.Hubs
         {
             var records = await _logService.AddRecord(logId, logs);
             await _logViewerHub.Clients.Group("Listen" + logId).SendAsync("ReceiveLog", records);
-        }
-
-        public void ArchiveConfiguration(string logId, string configuration)
-        {
-            var config = Configuration.Parser.ParseJson(configuration);
-            _argumentsService.ArchiveArguments(logId, config);
         }
     }
 }
