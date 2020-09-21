@@ -16,8 +16,9 @@ const routes = [{
     children: [{
       path: '/index',
       name: 'config',
-      component: () => import('@/views/arguments/Arguments'),
+      component: () => import('@/views/arguments/ArgumentList'),
       meta: {
+        drawer:()=>import('@/views/layout/DefaultNavigator'),
         title: 'Arguments'
       }
     }]
@@ -33,7 +34,7 @@ const routes = [{
       component: () => import('@/views/onlineLogger/OnlineLogger'),
       props: true,
       meta: {
-        drawer: () => import('@/views/onlineLogger/ClientChoose'),
+        drawer: () => import('@/views/layout/DefaultNavigator'),
         title: 'Online Logger'
       }
     }]
@@ -48,6 +49,7 @@ const routes = [{
       name: 'profile',
       component: () => import('@/views/profile/Profile'),
       meta: {
+        drawer: () => import('@/views/layout/DefaultNavigator'),
         title: 'Profile'
       }
     }]

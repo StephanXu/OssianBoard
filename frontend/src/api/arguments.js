@@ -1,8 +1,15 @@
 import request from '@/utils/request'
 
-export function getArguments() {
+export function listArguments(){
   return request({
     url: '/argument',
+    method: 'get'
+  })
+}
+
+export function getSingleArguments(argId) {
+  return request({
+    url: `/argument/${argId}`,
     method: 'get'
   })
 }
