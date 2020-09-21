@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Logger.Models;
-using Logger.Protos;
 using Microsoft.AspNetCore.SignalR;
 using Logger.Services;
 using Microsoft.AspNetCore.Authorization;

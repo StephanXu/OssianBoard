@@ -25,7 +25,6 @@ namespace Logger.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string ArgumentId { get; set; }
 
@@ -76,7 +75,7 @@ namespace Logger.Models
         public string ArgumentId { get; set; }
         public string Name { get; set; }
     }
-    
+
     public class ArgumentUpdateRequest
     {
         public string Content { get; set; }

@@ -18,11 +18,11 @@ namespace Logger.Services
     {
         private readonly IMongoCollection<Models.User> _users;
         private readonly string _secret;
-        
+
         public UserService(IConfiguration config)
         {
-            var client = new MongoClient(config.GetConnectionString("OnlineLogger"));
-            var database = client.GetDatabase("OnlineLogger");
+            var client = new MongoClient(config.GetConnectionString("DatabaseConnection"));
+            var database = client.GetDatabase(config.GetConnectionString("DatabaseName"));
             _users = database.GetCollection<Models.User>("users");
             _secret = config.GetSection("AppSettings")["Secret"];
         }

@@ -7,7 +7,6 @@ using System.Security.Policy;
 using MongoDB.Driver;
 using Logger.Models;
 using Microsoft.Extensions.Configuration;
-using Logger.Protos;
 using Logger.Models;
 
 namespace Logger.Services
@@ -41,8 +40,8 @@ namespace Logger.Services
 
         public ArgumentsService(IConfiguration config)
         {
-            var client = new MongoClient(config.GetConnectionString("OnlineLogger"));
-            var database = client.GetDatabase("OnlineLogger");
+            var client = new MongoClient(config.GetConnectionString("DatabaseConnection"));
+            var database = client.GetDatabase(config.GetConnectionString("DatabaseName"));
             _arguments = database.GetCollection<ArgumentModel>("arguments");
             _snapshots = database.GetCollection<ArgumentSnapshotModel>("argumentsSnapshots");
             _snapshotsWithLog = database.GetCollection<LogWithArgumentSnapshot>("arguments");

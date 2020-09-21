@@ -39,8 +39,8 @@ namespace Logger.Services
         public LogService(IConfiguration config, IArgumentsService argumentsService)
         {
             _argumentsService = argumentsService;
-            var client = new MongoClient(config.GetConnectionString("OnlineLogger"));
-            var database = client.GetDatabase("OnlineLogger");
+            var client = new MongoClient(config.GetConnectionString("DatabaseConnection"));
+            var database = client.GetDatabase(config.GetConnectionString("DatabaseName"));
             _logCollection = database.GetCollection<LogModel>("logs");
             _recordCollection = database.GetCollection<RecordModel>("records");
             _plotCollection = database.GetCollection<PlotModel>("plots");

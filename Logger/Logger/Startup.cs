@@ -16,11 +16,12 @@ using Logger.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace Logger
 {
     public class Startup
-    { 
+    {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -33,10 +34,7 @@ namespace Logger
         {
             services.AddControllers();
             services.AddCors();
-            services.AddSignalR(option =>
-                {
-                    option.MaximumReceiveMessageSize = null;
-                })
+            services.AddSignalR(option => { option.MaximumReceiveMessageSize = null; })
                 .AddMessagePackProtocol()
                 .AddJsonProtocol();
             services.AddScoped<UserService>();
@@ -44,8 +42,31 @@ namespace Logger
             services.AddSingleton<ILogService, LogService>();
             services.AddHostedService<QueuedHostedService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-            services.AddGrpc(option => { option.EnableDetailedErrors = true; });
-            
+            services.AddSwaggerGen(option =>
+            {
+                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "Please enter into field the word 'Bearer' followed by a space and the JWT value",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                });
+                option.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference()
+                            {
+                                Id = "Bearer",
+                                Type = ReferenceType.SecurityScheme
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+
             var key = Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings")["Secret"]);
             services.AddAuthentication(option =>
                 {
@@ -76,6 +97,7 @@ namespace Logger
                             {
                                 context.Token = accessToken;
                             }
+
                             return Task.CompletedTask;
                         }
                     };
@@ -90,18 +112,17 @@ namespace Logger
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Board API v1"); });
+
             app.UseRouting();
-
             app.UseAuthentication();
-
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<LoggerHub>("/logger");
                 endpoints.MapHub<LogViewerHub>("/log-viewer");
-                endpoints.MapGrpcService<OnlineLogServiceImpl>();
             });
         }
     }
