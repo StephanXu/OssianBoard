@@ -39,8 +39,8 @@ export default {
     },
     actions: {
         login({
-            commit
-        }, userInfo) {
+                  commit
+              }, userInfo) {
             const {
                 username,
                 password
@@ -60,15 +60,15 @@ export default {
                     commit('SET_NAME', userName)
                     setToken(token)
                     resolve()
-                }).catch(error => {
-                    reject(error)
+                }).catch((err) => {
+                    reject(err)
                 })
             })
         },
         // get user info
         getInfo({
-            commit
-        }) {
+                    commit
+                }) {
             return new Promise((resolve, reject) => {
                 getInfo().then(response => {
                     const data = response
@@ -96,9 +96,9 @@ export default {
 
         // user logout
         logout({
-            commit,
-            state
-        }) {
+                   commit,
+                   state
+               }) {
             return new Promise((resolve, reject) => {
                 logout(state.token).then(() => {
                     commit('SET_TOKEN', '')

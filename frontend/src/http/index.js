@@ -10,7 +10,7 @@ axios.defaults.baseURL = '/';
  */
 
 export function get(url, params = {}) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     axios.get(url, {
       params: params
     })
@@ -18,7 +18,7 @@ export function get(url, params = {}) {
         resolve(response.data);
       })
       .catch(err => {
-        reject(err)
+        throw(err)
       })
   })
 }
@@ -32,12 +32,12 @@ export function get(url, params = {}) {
  */
 
 export function post(url, data = {}) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     axios.post(url, data)
       .then(response => {
         resolve(response.data);
       }, err => {
-        reject(err)
+        throw(err)
       })
   })
 }
@@ -50,12 +50,12 @@ export function post(url, data = {}) {
 */
 
 export function patch(url, data = {}) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     axios.patch(url, data)
       .then(response => {
         resolve(response.data);
       }, err => {
-        reject(err)
+        throw(err)
       })
   })
 }
@@ -68,12 +68,12 @@ export function patch(url, data = {}) {
 */
 
 export function put(url, data = {}) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     axios.put(url, data)
       .then(response => {
         resolve(response.data);
       }, err => {
-        reject(err)
+        throw(err)
       })
   })
 }

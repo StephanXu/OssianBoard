@@ -75,9 +75,6 @@ export default {
     switchTheme() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
     },
-  },
-  beforeCreate() {
-    this.$vuetify.theme.dark = true;
   }
 };
 </script>
