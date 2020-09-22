@@ -166,9 +166,6 @@ export default {
       await this.$store.dispatch("user/logout");
       this.$router.push({ path: "/login" });
     },
-    switchPage(row) {
-      this.$router.push({ path: row.redirect });
-    },
     handleContextMenu(event, logId) {
       this.showMenu = false;
       this.menuPosX = event.clientX;

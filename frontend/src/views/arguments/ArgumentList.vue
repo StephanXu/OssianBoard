@@ -13,7 +13,8 @@
                   :key="argItem.id"
                   height="200"
                   width="325"
-                  class="d-flex align-center justify-center mr-5">
+                  class="d-flex align-center justify-center mr-5"
+                  @click="handleArgumentsCardClick(argItem.id)">
             <div class="display-2 flex-grow-1 text-center d-block">
               {{ argItem.name }}
             </div>
@@ -48,6 +49,11 @@ export default {
       console.log(this.argumentMetaList)
     })
   },
+  methods: {
+    handleArgumentsCardClick(argId) {
+      this.$router.push({path: `/argument/${argId}`})
+    }
+  }
 }
 </script>
 

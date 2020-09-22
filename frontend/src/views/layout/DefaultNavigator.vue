@@ -1,26 +1,25 @@
 <template>
-  <v-navigation-drawer v-model="drawer" app clipped>
-    <v-list nav>
-      <v-list-item link>
-        <v-list-item-content>
-          <v-list-item-title class="title">
-            {{ alias }}
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            {{ name }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
+  <v-navigation-drawer app clipped :mini-variant.sync="drawer">
+    <v-list-item class="px-2 mb-2 mt-2">
+      <v-list-item-avatar>
+        <v-img src="https://i.loli.net/2020/09/23/3mQ6Xy2wqIEn9xW.png"></v-img>
+      </v-list-item-avatar>
+
+      <v-list-item-title>{{ alias }}</v-list-item-title>
+
+      <v-btn icon @click.stop="drawer = !drawer">
+        <v-icon>mdi-chevron-left</v-icon>
+      </v-btn>
+    </v-list-item>
 
     <v-divider></v-divider>
     <v-list dense nav flat>
       <v-list-item-group v-model="currentView" color="primary">
         <v-list-item
-          v-for="item in items"
-          :key="item.title"
-          link
-          :to="item.redirect"
+            v-for="item in items"
+            :key="item.title"
+            link
+            :to="item.redirect"
         >
           <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
@@ -41,7 +40,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 
 export default {
   name: "DefaultNavigator",
@@ -58,7 +57,7 @@ export default {
         {
           icon: "mdi-view-dashboard",
           title: "Arguments",
-          redirect: "/index"
+          redirect: "/argument"
         },
         {
           icon: "mdi-chart-areaspline",
@@ -87,7 +86,7 @@ export default {
   methods: {
     async logout() {
       await this.$store.dispatch("user/logout");
-      this.$router.push({ path: "/login" });
+      this.$router.push({path: "/login"});
     }
   }
 };
