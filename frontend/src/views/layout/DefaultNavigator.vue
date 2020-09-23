@@ -1,16 +1,25 @@
 <template>
   <v-navigation-drawer app clipped :mini-variant.sync="drawer">
-    <v-list-item class="px-2 mb-2 mt-2">
-      <v-list-item-avatar>
-        <v-img src="https://i.loli.net/2020/09/23/3mQ6Xy2wqIEn9xW.png"></v-img>
-      </v-list-item-avatar>
+    <v-list>
+      <v-list-item class="px-2">
+        <v-list-item-avatar>
+          <v-img src="https://i.loli.net/2020/09/23/3mQ6Xy2wqIEn9xW.png"></v-img>
+        </v-list-item-avatar>
 
-      <v-list-item-title>{{ alias }}</v-list-item-title>
+        <v-list-item-title></v-list-item-title>
 
-      <v-btn icon @click.stop="drawer = !drawer">
-        <v-icon>mdi-chevron-left</v-icon>
-      </v-btn>
-    </v-list-item>
+        <v-btn icon @click.stop="drawer = !drawer">
+          <v-icon>mdi-chevron-left</v-icon>
+        </v-btn>
+      </v-list-item>
+
+      <v-list-item link>
+        <v-list-item-content>
+          <v-list-item-title class="title">{{ alias }}</v-list-item-title>
+          <v-list-item-subtitle>{{ name }}</v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
 
     <v-divider></v-divider>
     <v-list dense nav flat>

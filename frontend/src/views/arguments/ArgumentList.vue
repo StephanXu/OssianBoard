@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-container class="pl-3">
-      <v-btn small color="primary" @click="newSchemaVisible=true">New</v-btn>
+      <v-btn small color="primary" @click="handleCreateNewSchema">New</v-btn>
     </v-container>
     <v-container class="pl-3">
       <div>
@@ -22,20 +22,14 @@
         </v-container>
       </v-item-group>
     </v-container>
-
-    <NewArgument v-model="newSchemaVisible"></NewArgument>
   </v-container>
 </template>
 
 <script>
 import {mapGetters} from 'vuex'
-import NewArgument from "@/views/arguments/NewArgument";
 
 export default {
   name: "ArgumentList",
-  components: {
-    NewArgument
-  },
   computed: {
     ...mapGetters('argument', ['argumentMetaList'])
   },
@@ -52,6 +46,9 @@ export default {
   methods: {
     handleArgumentsCardClick(argId) {
       this.$router.push({path: `/argument/${argId}`})
+    },
+    handleCreateNewSchema() {
+      this.$router.push({path: '/argument/new'})
     }
   }
 }
