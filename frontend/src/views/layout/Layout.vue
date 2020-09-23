@@ -1,16 +1,16 @@
 <template>
   <v-app id="inspire">
-    <component :is="currentNavigatorDrawer" v-model="drawer" />
+    <component :is="currentNavigatorDrawer" v-model="drawer"/>
     <v-app-bar
-      app
-      clipped-left
-      outlined
-      flat
-      dense
+        app
+        clipped-left
+        outlined
+        flat
+        dense
     >
       <v-app-bar-nav-icon
-        v-if="currentNavigatorDrawer"
-        @click.stop="drawer = !drawer"
+          v-if="currentNavigatorDrawer"
+          @click.stop="drawer = !drawer"
       />
 
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
@@ -26,15 +26,24 @@
 
     <v-content>
       <transition name="slide-fade" mode="out-in">
-        <router-view :key="key" />
+        <router-view :key="key"/>
       </transition>
     </v-content>
+
+    <v-footer app outlined>
+      <v-row no-gutters>
+        <v-col class="text-center" cols="12">
+          {{ new Date().getFullYear() }} — <strong>Ossian Board</strong>
+        </v-col>
+      </v-row>
+    </v-footer>
   </v-app>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 import DefaultNavigator from "./DefaultNavigator";
+
 export default {
   components: {
     DefaultNavigator,
@@ -83,13 +92,16 @@ export default {
 .slide-fade-enter-active {
   transition: all 0.3s ease;
 }
+
 .slide-fade-leave-active {
   transition: all 0.1s ease;
 }
+
 .slide-fade-enter {
   transform: translateX(10px);
   opacity: 0;
 }
+
 .slide-fade-leave-to {
   transform: translateX(-10px);
   opacity: 0;

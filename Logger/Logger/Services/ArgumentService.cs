@@ -96,7 +96,7 @@ namespace Logger.Services
 
         public void UpdateArguments(string argId, ArgumentModel argument)
         {
-            _arguments.ReplaceOne(item => true, argument);
+            _arguments.ReplaceOne(item => item.Id==argId, argument);
         }
 
         public ArgumentSnapshotMeta CreateSnapshot(string argId, string name)

@@ -10,33 +10,49 @@
       <v-btn text @click="errorTip.visible = false">OK</v-btn>
     </v-snackbar>
 
-    <editor
-        v-if="isNew"
-        v-model="newSchema"
-        @init="editorInit"
-        :options="editorOptions"
-        lang="json"
-        theme="monokai"
-        width="100%"
-        height="300px">
-    </editor>
-    <v-container fluid>
-      <v-container fluid class="d-flex justify-space-between">
-        <div>
-          <v-btn color="primary" text @click="handleBackButton">
-            <v-icon left>mdi-arrow-left</v-icon>
-            Back to list
-          </v-btn>
-          <h1>{{ arg.name }}</h1>
-          <span class="text-subtitle-1">{{ arg.description }}</span>
+    <v-row no-gutters>
+      <v-col>
+        <v-container fluid :style="rowStyle" :class="scrollbarTheme">
+          <v-container fluid class="d-flex justify-space-between">
+            <div>
+              <v-btn color="primary" text @click="handleBackButton">
+                <v-icon left>mdi-arrow-left</v-icon>
+                Back to list
+              </v-btn>
+              <h1>{{ arg.name }}</h1>
+              <p class="text-subtitle-1">{{ arg.description }}</p>
+              <v-btn
+                  outlined
+                  dense
+                  color="primary"
+                  @click="handleCopyId">
+                <v-icon left>mdi-link-variant</v-icon>
+                {{ isNew ? 'Present after creation' : arg.id }}
+              </v-btn>
+            </div>
+            <v-btn depressed large color="success" @click="handleSave" :loading="isSaving">
+              <v-icon left>save</v-icon>
+              Save
+            </v-btn>
+          </v-container>
+          <FormSchema :schema="arg.schema" v-model="arg.content"></FormSchema>
+        </v-container>
+      </v-col>
+      <v-col cols="6" v-if="isNew">
+        <div :style="rowStyle">
+          <editor
+              v-model="newSchema"
+              @init="editorInit"
+              :options="editorOptions"
+              lang="json"
+              :theme="editorTheme"
+              width="100%"
+              height="100%">
+          </editor>
         </div>
-        <v-btn depressed large color="success" @click="handleSave" :loading="isSaving">
-          <v-icon left>save</v-icon>
-          Save
-        </v-btn>
-      </v-container>
-      <FormSchema :schema="arg.schema" v-model="arg.content"></FormSchema>
-    </v-container>
+      </v-col>
+    </v-row>
+
   </div>
 </template>
 
@@ -59,6 +75,7 @@ export default {
   },
   computed: {
     ...mapGetters('argument', ['argumentMetaList']),
+    ...mapGetters('view', ['clientHeight', 'clientWidth']),
     newSchema: {
       get() {
         return this.newSchemaJson
@@ -66,11 +83,30 @@ export default {
       set(val) {
         this.newSchemaJson = val
         this.arg.schema = JSON.parse(val)
+        if (this.isNew) {
+          localStorage.newSchema = val
+        }
         if (this.arg.schema.hasOwnProperty('meta') && this.arg.schema.meta.hasOwnProperty('title')) {
           this.arg.name = this.arg.schema.meta.title
           this.arg.description = this.arg.schema.meta.description
         }
       }
+    },
+    editorTheme() {
+      if (this.$vuetify.theme.dark) {
+        return 'monokai'
+      } else {
+        return 'dawn'
+      }
+    },
+    rowStyle() {
+      return {
+        'overflow-y': 'auto',
+        'height': `${this.clientHeight - this.$vuetify.application.top - this.$vuetify.application.footer}px`
+      }
+    },
+    scrollbarTheme() {
+      return this.$vuetify.theme.dark ? 'dark' : 'light';
     }
   },
   data() {
@@ -105,17 +141,18 @@ export default {
   },
   methods: {
     editorInit: function () {
-      require("brace/ext/language_tools");
-      require("brace/mode/html");
-      require("brace/mode/javascript");
-      require("brace/mode/less");
-      require("brace/theme/monokai");
-      require("brace/snippets/javascript");
+      require("brace/ext/language_tools")
+      require("brace/mode/html")
+      require("brace/mode/javascript")
+      require("brace/mode/less")
+      require("brace/theme/monokai")
+      require("brace/theme/dawn")
+      require("brace/snippets/javascript")
 
-      require("brace");
-      require("brace/mode/json");
-      require("brace/snippets/json");
-      require("brace/snippets/html");
+      require("brace")
+      require("brace/mode/json")
+      require("brace/snippets/json")
+      require("brace/snippets/html")
     },
     handleBackButton() {
       this.$router.push({path: 'index'})
@@ -123,14 +160,14 @@ export default {
     handleSave() {
       this.isSaving = true
       let saveProc = this.isNew ? createArguments(this.arg) : updateSingleArguments(this.arg)
-      saveProc.then(() => {
+      saveProc.then(response => {
         this.successTip = {
           message: "Save success",
           visible: true,
         }
         this.isSaving = false
         if (this.isNew) {
-          this.$router.push({path: `index`})
+          this.$router.push({path: `${response.id}`})
         }
       }).catch(error => {
         this.errorTip = {
@@ -139,6 +176,19 @@ export default {
         }
         this.isSaving = false
         return Promise.reject(error)
+      })
+    },
+    handleCopyId() {
+      this.$copyText(this.arg.id).then(() => {
+        this.successTip = {
+          message: "Copied!",
+          visible: true
+        }
+      }, () => {
+        this.errorTip = {
+          message: "Copy failed.",
+          visible: true
+        }
       })
     }
   },
@@ -152,12 +202,26 @@ export default {
         schema: {},
         content: {}
       }
+      if (localStorage.newSchema) {
+        this.newSchema = localStorage.newSchema
+      }
     } else {
+      this.isNew = false
       let metaData = this.argumentMetaList.find(item => item.id === this.argId)
-      this.arg.id = metaData.id
-      this.arg.createTime = metaData.createTime
-      this.arg.name = metaData.name
-      this.arg = await getSingleArguments(this.argId)
+      if (metaData) {
+        this.arg.id = metaData.id
+        this.arg.createTime = metaData.createTime
+        this.arg.name = metaData.name
+      }
+      let arg = await getSingleArguments(this.argId)
+      this.arg = {
+        ...arg,
+        schema: JSON.parse(arg.schema),
+        content: JSON.parse(arg.content)
+      }
+      if (arg && !metaData) {
+        await this.$store.dispatch('argument/fetchArgumentList')
+      }
     }
 
   }
@@ -165,5 +229,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

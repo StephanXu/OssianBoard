@@ -38,10 +38,10 @@ export default {
       newSchemaVisible: false
     }
   },
-  created() {
-    this.$store.dispatch('argument/fetchArgumentList').then(() => {
-      console.log(this.argumentMetaList)
-    })
+  async created() {
+    if (this.argumentMetaList.length == 0) {
+      await this.$store.dispatch('argument/fetchArgumentList')
+    }
   },
   methods: {
     handleArgumentsCardClick(argId) {

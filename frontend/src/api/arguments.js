@@ -19,7 +19,7 @@ export function updateSingleArguments({id, content}) {
         url: `/argument/${id}`,
         method: 'put',
         data: {
-            content
+            content:JSON.stringify(content)
         }
     })
 }

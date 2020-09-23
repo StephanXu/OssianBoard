@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer app clipped :mini-variant.sync="drawer">
+  <v-navigation-drawer app clipped :mini-variant.sync="drawer" permanent>
     <v-list>
       <v-list-item class="px-2">
         <v-list-item-avatar>
