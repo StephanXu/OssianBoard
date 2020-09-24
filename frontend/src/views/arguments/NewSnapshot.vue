@@ -1,13 +1,15 @@
 <template>
-  <v-dialog v-model="value" max-width="500px">
-    <v-snackbar v-model="errorTip.visible" color="error" bottom>
+  <v-dialog v-model="value" max-width="500px" persistent>
+    <v-snackbar v-model="errorTip.visible" color="error" top>
       {{ errorTip.message }}
-      <v-btn text @click="errorTip.visible = false">OK</v-btn>
+      <template v-slot:action="{ attrs }">
+        <v-btn text v-bind="attrs" @click="errorTip.visible = false">OK</v-btn>
+      </template>
     </v-snackbar>
 
     <v-card>
-      <v-card-title class="headline">
-        New Snapshot
+      <v-card-title class="justify-center">
+        <strong>New Snapshot</strong>
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text>

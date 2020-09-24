@@ -1,19 +1,19 @@
 <template>
   <v-container fluid>
     <v-container class="pl-3">
-      <v-btn small color="primary" @click="handleCreateNewSchema">New</v-btn>
+      <v-btn small color="primary" @click="handleCreateNewSchema" depressed>New</v-btn>
     </v-container>
     <v-container class="pl-3">
       <div>
-        <h2 class="ml-0 pl-0 pt-0">All schema:</h2>
+        <h2>All schema:</h2>
       </div>
-      <v-item-group class="ml-n3">
-        <v-container class="d-flex">
+      <v-item-group class="ml-n3 mt-n5">
+        <v-container class="d-flex flex-wrap">
           <v-card v-for="argItem in argumentMetaList"
                   :key="argItem.id"
                   height="200"
                   width="325"
-                  class="d-flex align-center justify-center mr-5"
+                  class="d-flex align-center justify-center mr-5 mt-5"
                   @click="handleArgumentsCardClick(argItem.id)">
             <div class="display-2 flex-grow-1 text-center d-block">
               {{ argItem.name }}

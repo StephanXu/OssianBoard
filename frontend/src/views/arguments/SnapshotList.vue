@@ -1,8 +1,8 @@
 <template>
-  <v-dialog v-model="value" max-width="800px">
+  <v-dialog v-model="value" max-width="800px" persistent>
     <v-card>
-      <v-card-title class="headline text-center">
-        Snapshots
+      <v-card-title class="justify-center">
+        <strong>Snapshots</strong>
       </v-card-title>
       <v-divider></v-divider>
       <v-virtual-scroll

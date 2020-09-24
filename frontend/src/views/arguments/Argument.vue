@@ -1,20 +1,24 @@
 <template>
   <div>
-    <v-snackbar v-model="successTip.visible" color="success" bottom>
+    <v-snackbar v-model="successTip.visible" color="success" top>
       {{ successTip.message }}
-      <v-btn text @click="successTip.visible = false">OK</v-btn>
+      <template v-slot:action="{ attrs }">
+        <v-btn text v-bind="attrs" @click="successTip.visible = false">OK</v-btn>
+      </template>
     </v-snackbar>
 
-    <v-snackbar v-model="errorTip.visible" color="error" bottom>
+    <v-snackbar v-model="errorTip.visible" color="error" top>
       {{ errorTip.message }}
-      <v-btn text @click="errorTip.visible = false">OK</v-btn>
+      <template v-slot:action="{ attrs }">
+        <v-btn text v-bind="attrs" @click="errorTip.visible = false">OK</v-btn>
+      </template>
     </v-snackbar>
 
 
     <v-row no-gutters>
       <v-col>
         <v-container fluid :style="rowStyle" :class="scrollbarTheme">
-          <v-container fluid class="d-flex justify-space-between">
+          <v-container fluid class="d-flex justify-space-between flex-wrap">
             <div>
               <v-btn color="primary" text @click="handleBackButton">
                 <v-icon left>mdi-arrow-left</v-icon>
@@ -151,9 +155,9 @@ export default {
       if (this.isNew) {
         return ''
       } else if (this.isSnapshot) {
-        return `Snapshot on ${timeToString(this.arg.createTime)}`
+        return `Snapshot created at ${timeToString(this.arg.createTime)}`
       } else {
-        return `Create on ${timeToString(this.arg.createTime)}`
+        return `Created at ${timeToString(this.arg.createTime)}`
       }
     }
   },
