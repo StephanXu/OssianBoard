@@ -36,9 +36,16 @@ export function createArguments({name, schema, content}) {
     })
 }
 
-export function createArgumentsSnapshot(argId, name) {
+export function deleteArguments(argId) {
     return request({
         url: `/argument/${argId}`,
+        method: 'delete'
+    })
+}
+
+export function createArgumentsSnapshot(argId, name) {
+    return request({
+        url: `/argument/${argId}/snapshot`,
         method: 'post',
         data: {
             name
@@ -48,7 +55,38 @@ export function createArgumentsSnapshot(argId, name) {
 
 export function listArgumentsSnapshot(argId) {
     return request({
-        url: `/argument/${argId}`,
+        url: `/argument/${argId}/snapshot`,
+        method: 'get'
+    })
+}
+
+export function tagArgumentsSnapshot(snapshotId, tag) {
+    return request({
+        url: `/argument/snapshot/${snapshotId}/tag`,
+        method: 'post',
+        data: {
+            tag
+        }
+    })
+}
+
+export function untagArgumentsSnapshot(snapshotId) {
+    return request({
+        url: `/argument/snapshot/${snapshotId}/tag`,
+        method: 'delete'
+    })
+}
+
+export function deleteArgumentsSnapshot(snapshotId) {
+    return request({
+        url: `/argument/snapshot/${snapshotId}`,
+        method: 'delete'
+    })
+}
+
+export function getSingleArgumentsSnapshot(snapshotId) {
+    return request({
+        url: `/argument/snapshot/${snapshotId}`,
         method: 'get'
     })
 }

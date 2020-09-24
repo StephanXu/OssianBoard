@@ -29,6 +29,7 @@ namespace Logger.Services
         public void UnbindSnapshotFromLogId(string logId);
         public void RemoveArguments(string argId);
         public ArgumentSnapshotModel GetSingleSnapshotFromLogId(string logId);
+        public void TagSnapshot(string snapshotId, string tag);
     }
 
     public class ArgumentsService : IArgumentsService
@@ -82,6 +83,7 @@ namespace Logger.Services
         public IEnumerable<ArgumentSnapshotMeta> ListSnapshot(string argId) =>
             _snapshots.AsQueryable()
                 .Where(item => item.ArgumentId == argId)
+                .OrderByDescending(item => item.CreateTime)
                 .Select(item => new ArgumentSnapshotMeta
                 {
                     Id = item.Id,
@@ -96,7 +98,7 @@ namespace Logger.Services
 
         public void UpdateArguments(string argId, ArgumentModel argument)
         {
-            _arguments.ReplaceOne(item => item.Id==argId, argument);
+            _arguments.ReplaceOne(item => item.Id == argId, argument);
         }
 
         public ArgumentSnapshotMeta CreateSnapshot(string argId, string name)
@@ -171,7 +173,7 @@ namespace Logger.Services
         {
             _snapshotsWithLog.DeleteMany(item => item.LogId == logId);
         }
-        
+
         public void RemoveArguments(string argId)
         {
             var arg = _arguments.AsQueryable()
@@ -183,7 +185,8 @@ namespace Logger.Services
 
             var snapshotIds = _snapshots.AsQueryable()
                 .Where(item => item.ArgumentId == argId)
-                .Select(item => item.Id);
+                .Select(item => item.Id)
+                .ToList();
             _snapshotsWithLog.DeleteMany(item => snapshotIds.Contains(item.ArgumentSnapshotId));
             _snapshots.DeleteMany(item => item.ArgumentId == argId);
             _arguments.DeleteOne(item => item.Id == argId);
@@ -197,9 +200,23 @@ namespace Logger.Services
             {
                 return null;
             }
+
             var snapshot = _snapshots.AsQueryable()
                 .FirstOrDefault(item => item.Id == relation.ArgumentSnapshotId);
             return snapshot;
+        }
+
+        public void TagSnapshot(string snapshotId, string tag)
+        {
+            var snapshot = _snapshots.AsQueryable()
+                .FirstOrDefault(item => item.Id == snapshotId);
+            if (snapshot == null)
+            {
+                throw new Exception("Snapshot does not exist");
+            }
+
+            snapshot.Tag = tag;
+            _snapshots.ReplaceOne(item => item.Id == snapshotId, snapshot);
         }
     }
 }

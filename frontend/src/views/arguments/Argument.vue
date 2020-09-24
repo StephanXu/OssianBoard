@@ -18,28 +18,34 @@
             <div>
               <v-btn color="primary" text @click="handleBackButton">
                 <v-icon left>mdi-arrow-left</v-icon>
-                Back to list
+                Back to {{ isSnapshot ? "argument" : "list" }}
               </v-btn>
               <h1>{{ arg.name }}</h1>
               <p class="text-subtitle-1">{{ arg.description }}</p>
               <v-btn
                   outlined
                   dense
-                  color="primary"
+                  :color="isSnapshot?'gray':'primary'"
                   @click="handleCopyId"
                   :disabled="isNew">
-                <v-icon left>mdi-link-variant</v-icon>
-                {{ isNew ? 'Present after creation' : arg.id }}
+                <v-icon left>{{ isSnapshot ? "event" : "mdi-link-variant" }}</v-icon>
+                {{ presentId }}
               </v-btn>
+              <v-subheader class="ml-n4">{{ presentCreateTime }}</v-subheader>
             </div>
             <div class="d-flex flex-column">
-              <v-btn small color="success" @click="handleSave" :loading="isSaving">
+              <v-btn small depressed color="success" @click="handleSave" :loading="isSaving">
                 <v-icon left>save</v-icon>
                 Save
               </v-btn>
-              <v-btn small class="mt-2" @click="isSnapshotListVisible=true">
+              <v-btn small depressed v-if="!isNew && !isSnapshot" class="mt-2" @click="isSnapshotListVisible=true">
                 <v-icon left>event</v-icon>
                 Snapshot
+              </v-btn>
+              <v-btn small depressed v-if="!isNew" color="error" class="mt-2" @click="handleDelete"
+                     :loading="isDeleting">
+                <v-icon left>mdi-delete</v-icon>
+                Delete
               </v-btn>
             </div>
           </v-container>
@@ -60,7 +66,7 @@
         </div>
       </v-col>
     </v-row>
-    <snapshot-list :arg-id="this.arg.id" v-model="isSnapshotListVisible"></snapshot-list>
+    <snapshot-list :arg-id="this.argId" v-model="isSnapshotListVisible"></snapshot-list>
   </div>
 </template>
 
@@ -68,11 +74,14 @@
 import {
   getSingleArguments,
   createArguments,
-  updateSingleArguments
+  updateSingleArguments,
+  deleteArguments,
+  getSingleArgumentsSnapshot, deleteArgumentsSnapshot
 } from "@/api/arguments";
 import {mapGetters} from 'vuex'
 import FormSchema from "@/views/arguments/FormSchema";
 import SnapshotList from "@/views/arguments/SnapshotList";
+import {timeToString} from "@/utils/utility";
 
 export default {
   name: "Argument",
@@ -128,6 +137,24 @@ export default {
     },
     isSnapshot() {
       return this.snapshotId != 'latest'
+    },
+    presentId() {
+      if (this.isNew) {
+        return 'Present after creation'
+      } else if (this.isSnapshot) {
+        return this.snapshotId
+      } else {
+        return this.arg.id
+      }
+    },
+    presentCreateTime() {
+      if (this.isNew) {
+        return ''
+      } else if (this.isSnapshot) {
+        return `Snapshot on ${timeToString(this.arg.createTime)}`
+      } else {
+        return `Create on ${timeToString(this.arg.createTime)}`
+      }
     }
   },
   data() {
@@ -158,7 +185,8 @@ export default {
         message: "",
         visible: false,
       },
-      isSnapshotListVisible: false
+      isSnapshotListVisible: false,
+      isDeleting: false
     }
   },
   methods: {
@@ -177,7 +205,11 @@ export default {
       require("brace/snippets/html")
     },
     handleBackButton() {
-      this.$router.push({path: '/argument/index'})
+      if (this.isSnapshot) {
+        this.$router.push({path: `/argument/${this.argId}`})
+      } else {
+        this.$router.push({path: '/argument/index'})
+      }
     },
     handleSave() {
       this.isSaving = true
@@ -201,7 +233,7 @@ export default {
       })
     },
     handleCopyId() {
-      this.$copyText(this.arg.id).then(() => {
+      this.$copyText(this.presentId).then(() => {
         this.successTip = {
           message: "Copied!",
           visible: true
@@ -212,11 +244,22 @@ export default {
           visible: true
         }
       })
+    },
+    async handleDelete() {
+      this.isDeleting = true
+      if (this.isSnapshot) {
+        await deleteArgumentsSnapshot(this.snapshotId)
+        await this.$router.push({path: `/argument/${this.argId}`})
+        this.isDeleting = false
+      } else {
+        await deleteArguments(this.arg.id)
+        await this.$store.dispatch('argument/fetchArgumentList')
+        await this.$router.push({path: '/argument/index'})
+        this.isDeleting = false
+      }
     }
   },
   async created() {
-    console.log(this.argId)
-    console.log(this.snapshotId)
     if (this.argId === 'new') {
       this.isNew = true
       this.arg = {
@@ -238,10 +281,19 @@ export default {
         this.arg.name = metaData.name
       }
       let arg = await getSingleArguments(this.argId)
-      this.arg = {
-        ...arg,
-        schema: JSON.parse(arg.schema),
-        content: JSON.parse(arg.content)
+      if (this.isSnapshot) {
+        let snapshot = await getSingleArgumentsSnapshot(this.snapshotId)
+        this.arg = {
+          ...snapshot,
+          schema: JSON.parse(arg.schema),
+          content: JSON.parse(snapshot.content)
+        }
+      } else {
+        this.arg = {
+          ...arg,
+          schema: JSON.parse(arg.schema),
+          content: JSON.parse(arg.content)
+        }
       }
       if (arg && !metaData) {
         await this.$store.dispatch('argument/fetchArgumentList')

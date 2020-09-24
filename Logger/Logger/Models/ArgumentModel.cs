@@ -79,4 +79,9 @@ namespace Logger.Models
     {
         public string Content { get; set; }
     }
+
+    public class TagSnapshotRequest
+    {
+        public string Tag { get; set; }
+    }
 }

@@ -1,17 +1,12 @@
 <template>
-  <v-dialog v-model="value" persistent max-width="500px">
-    <v-snackbar v-model="successTip.visible" color="success" bottom>
-      {{ successTip.message }}
-      <v-btn text @click="successTip.visible = false">OK</v-btn>
-    </v-snackbar>
-
+  <v-dialog v-model="value" max-width="500px">
     <v-snackbar v-model="errorTip.visible" color="error" bottom>
       {{ errorTip.message }}
       <v-btn text @click="errorTip.visible = false">OK</v-btn>
     </v-snackbar>
 
     <v-card>
-      <v-card-title class="headline align-center">
+      <v-card-title class="headline">
         New Snapshot
       </v-card-title>
       <v-divider></v-divider>
@@ -32,7 +27,8 @@
 </template>
 
 <script>
-import {createArgumentsSnapshot} from "@/api/arguments";
+import {createArgumentsSnapshot, tagArgumentsSnapshot} from "@/api/arguments";
+import {timeToString} from "@/utils/utility";
 
 export default {
   name: "NewSnapshot",
@@ -46,15 +42,12 @@ export default {
       default: () => ''
     }
   },
+  computed: {},
   data() {
     return {
       snapshotName: '',
       snapshotTag: '',
       isSaving: false,
-      successTip: {
-        message: "",
-        visible: false,
-      },
       errorTip: {
         message: "",
         visible: false,
@@ -64,10 +57,9 @@ export default {
   methods: {
     handleApply() {
       this.isSaving = true
-      createArgumentsSnapshot(this.argId, this.snapshotName).then(() => {
-        this.successTip = {
-          message: 'Create snapshot success',
-          visible: true
+      createArgumentsSnapshot(this.argId, this.snapshotName).then(async response => {
+        if (this.snapshotTag.length > 0) {
+          await tagArgumentsSnapshot(response.id, this.snapshotTag)
         }
         this.$emit('input', false)
         this.isSaving = false
@@ -78,12 +70,15 @@ export default {
         }
         this.isSaving = false
       })
-    }
+    },
   },
-  created() {
-    let t = new Date(Date.now())
-    this.snapshotName =
-        `Snapshot-${t.getFullYear()}-${t.getMonth().toString().padStart(2, "0")}-${t.getDay().toString().padStart(2, "0")} ${t.getHours().toString().padStart(2, "0")}:${t.getMinutes().toString().padStart(2, "0")}:${t.getSeconds().toString().padStart(2, "0")}`
+  watch: {
+    value(newVal) {
+      if (newVal) {
+        this.snapshotName = `Snapshot-${timeToString(Date.now())}`
+        this.snapshotTag = ''
+      }
+    }
   }
 }
 </script>

@@ -88,5 +88,19 @@ namespace Logger.Controllers
             _argumentsService.RemoveArguments(argId);
             return Ok();
         }
+
+        [HttpPost("snapshot/{snapshotId}/tag")]
+        public ActionResult TagSnapshot([FromRoute] string snapshotId, TagSnapshotRequest tag)
+        {
+            _argumentsService.TagSnapshot(snapshotId, tag.Tag);
+            return Ok();
+        }
+
+        [HttpDelete("snapshot/{snapshotId}/tag")]
+        public ActionResult UntagSnapshot([FromRoute] string snapshotId)
+        {
+            _argumentsService.TagSnapshot(snapshotId, null);
+            return Ok();
+        }
     }
 }
