@@ -72,7 +72,6 @@ namespace Logger.Models
 
     public class CreateSnapshotRequest
     {
-        public string ArgumentId { get; set; }
         public string Name { get; set; }
     }
 

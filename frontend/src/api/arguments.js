@@ -19,7 +19,7 @@ export function updateSingleArguments({id, content}) {
         url: `/argument/${id}`,
         method: 'put',
         data: {
-            content:JSON.stringify(content)
+            content: JSON.stringify(content)
         }
     })
 }
@@ -33,5 +33,22 @@ export function createArguments({name, schema, content}) {
             schema: JSON.stringify(schema),
             content: JSON.stringify(content)
         }
+    })
+}
+
+export function createArgumentsSnapshot(argId, name) {
+    return request({
+        url: `/argument/${argId}`,
+        method: 'post',
+        data: {
+            name
+        }
+    })
+}
+
+export function listArgumentsSnapshot(argId) {
+    return request({
+        url: `/argument/${argId}`,
+        method: 'get'
     })
 }

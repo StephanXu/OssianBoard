@@ -10,6 +10,7 @@
       <v-btn text @click="errorTip.visible = false">OK</v-btn>
     </v-snackbar>
 
+
     <v-row no-gutters>
       <v-col>
         <v-container fluid :style="rowStyle" :class="scrollbarTheme">
@@ -25,15 +26,22 @@
                   outlined
                   dense
                   color="primary"
-                  @click="handleCopyId">
+                  @click="handleCopyId"
+                  :disabled="isNew">
                 <v-icon left>mdi-link-variant</v-icon>
                 {{ isNew ? 'Present after creation' : arg.id }}
               </v-btn>
             </div>
-            <v-btn depressed large color="success" @click="handleSave" :loading="isSaving">
-              <v-icon left>save</v-icon>
-              Save
-            </v-btn>
+            <div class="d-flex flex-column">
+              <v-btn small color="success" @click="handleSave" :loading="isSaving">
+                <v-icon left>save</v-icon>
+                Save
+              </v-btn>
+              <v-btn small class="mt-2" @click="isSnapshotListVisible=true">
+                <v-icon left>event</v-icon>
+                Snapshot
+              </v-btn>
+            </div>
           </v-container>
           <FormSchema :schema="arg.schema" v-model="arg.content"></FormSchema>
         </v-container>
@@ -52,25 +60,35 @@
         </div>
       </v-col>
     </v-row>
-
+    <snapshot-list :arg-id="this.arg.id" v-model="isSnapshotListVisible"></snapshot-list>
   </div>
 </template>
 
 <script>
-import {getSingleArguments, createArguments, updateSingleArguments} from "@/api/arguments";
+import {
+  getSingleArguments,
+  createArguments,
+  updateSingleArguments
+} from "@/api/arguments";
 import {mapGetters} from 'vuex'
 import FormSchema from "@/views/arguments/FormSchema";
+import SnapshotList from "@/views/arguments/SnapshotList";
 
 export default {
   name: "Argument",
   components: {
     FormSchema,
+    SnapshotList,
     editor: require("vue2-ace-editor")
   },
   props: {
     argId: {
       type: String,
       default: () => 'new'
+    },
+    snapshotId: {
+      type: String,
+      default: () => 'latest'
     }
   },
   computed: {
@@ -106,7 +124,10 @@ export default {
       }
     },
     scrollbarTheme() {
-      return this.$vuetify.theme.dark ? 'dark' : 'light';
+      return this.$vuetify.theme.dark ? 'dark' : 'light'
+    },
+    isSnapshot() {
+      return this.snapshotId != 'latest'
     }
   },
   data() {
@@ -136,7 +157,8 @@ export default {
       errorTip: {
         message: "",
         visible: false,
-      }
+      },
+      isSnapshotListVisible: false
     }
   },
   methods: {
@@ -155,7 +177,7 @@ export default {
       require("brace/snippets/html")
     },
     handleBackButton() {
-      this.$router.push({path: 'index'})
+      this.$router.push({path: '/argument/index'})
     },
     handleSave() {
       this.isSaving = true
@@ -193,6 +215,8 @@ export default {
     }
   },
   async created() {
+    console.log(this.argId)
+    console.log(this.snapshotId)
     if (this.argId === 'new') {
       this.isNew = true
       this.arg = {

@@ -34,9 +34,7 @@ export default {
     ...mapGetters('argument', ['argumentMetaList'])
   },
   data() {
-    return {
-      newSchemaVisible: false
-    }
+    return {}
   },
   async created() {
     if (this.argumentMetaList.length == 0) {

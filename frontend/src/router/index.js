@@ -39,6 +39,16 @@ const routes = [
                     drawer: () => import('@/views/layout/DefaultNavigator'),
                     title: 'Argument'
                 }
+            },
+            {
+                path: ':argId/snapshot/:snapshotId',
+                name: 'singleSnapshot',
+                component: () => import('@/views/arguments/Argument'),
+                props: true,
+                meta: {
+                    drawer: () => import('@/views/layout/DefaultNavigator'),
+                    title: 'Argument Snapshot'
+                }
             }]
     },
     {
