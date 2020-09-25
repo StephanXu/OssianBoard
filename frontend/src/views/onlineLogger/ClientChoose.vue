@@ -1,7 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="drawer" app clipped width="400px">
-    <v-divider />
-
+  <v-navigation-drawer v-model="value" app right clipped width="400px">
     <v-item-group v-model="selectedLogIndex">
       <v-container>
         <v-row v-for="item in logList" :key="item.id">

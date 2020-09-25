@@ -1,9 +1,14 @@
 <template>
   <v-app id="inspire">
-    <component :is="currentNavigatorDrawer" v-model="drawer"/>
+    <transition name="slide-fade" mode="out-in">
+      <component :is="rightNavigatorDrawer" v-model="rightDrawer"></component>
+    </transition>
+    <component :is="currentNavigatorDrawer" v-model="drawer"></component>
+
     <v-app-bar
         app
         clipped-left
+        clipped-right
         outlined
         flat
         dense
@@ -24,11 +29,11 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content>
+    <v-main>
       <transition name="slide-fade" mode="out-in">
         <router-view :key="key"/>
       </transition>
-    </v-content>
+    </v-main>
 
     <v-footer app outlined>
       <v-row no-gutters>
@@ -53,6 +58,7 @@ export default {
   },
   data: () => ({
     drawer: null,
+    rightDrawer: true,
     items: [
       {
         icon: "mdi-view-dashboard",
@@ -79,6 +85,9 @@ export default {
     currentNavigatorDrawer() {
       return this.$route.meta.drawer;
     },
+    rightNavigatorDrawer() {
+      return this.$route.meta.rightDrawer;
+    }
   },
   methods: {
     switchTheme() {

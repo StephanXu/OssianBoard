@@ -63,6 +63,7 @@ const routes = [
             props: true,
             meta: {
                 drawer: () => import('@/views/layout/DefaultNavigator'),
+                rightDrawer:()=>import('@/views/onlineLogger/ClientChoose'),
                 title: 'Online Logger'
             }
         }]
