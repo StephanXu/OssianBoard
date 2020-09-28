@@ -80,7 +80,8 @@ import {
   createArguments,
   updateSingleArguments,
   deleteArguments,
-  getSingleArgumentsSnapshot, deleteArgumentsSnapshot
+  getSingleArgumentsSnapshot,
+  deleteArgumentsSnapshot
 } from "@/api/arguments";
 import {mapGetters} from 'vuex'
 import FormSchema from "@/views/arguments/FormSchema";
@@ -117,9 +118,9 @@ export default {
         if (this.isNew) {
           localStorage.newSchema = val
         }
-        if (this.arg.schema.hasOwnProperty('meta') && this.arg.schema.meta.hasOwnProperty('title')) {
-          this.arg.name = this.arg.schema.meta.title
-          this.arg.description = this.arg.schema.meta.description
+        if (this.arg.schema.hasOwnProperty('description') && this.arg.schema.hasOwnProperty('title')) {
+          this.arg.name = this.arg.schema.title
+          this.arg.description = this.arg.schema.description
         }
       }
     },

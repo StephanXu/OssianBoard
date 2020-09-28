@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-tabs v-model="tabIndex" background-color="transparent">
-      <v-tab v-for="(tab,index) in schema.properties" :key="index">{{ tab.meta.title }}</v-tab>
+      <v-tab v-for="(tab,index) in schema.properties" :key="index">{{ tab.title }}</v-tab>
     </v-tabs>
     <v-tabs-items v-model="tabIndex" class="transparent">
       <v-tab-item v-for="(tab,index) in schema.properties" :key="index">
@@ -11,8 +11,8 @@
               :key="cardIndex"
               outlined
               class="mt-5">
-            <v-card-title>{{ card.meta.title }}</v-card-title>
-            <v-card-subtitle>{{ card.meta.description }}</v-card-subtitle>
+            <v-card-title>{{ card.title }}</v-card-title>
+            <v-card-subtitle>{{ card.description }}</v-card-subtitle>
             <v-card-text>
               <div
                   v-for="(field,fieldIndex) in card.properties"
@@ -32,7 +32,7 @@
                     :label="field.title"
                     item-text="label"
                     item-value="value"
-                    :items="field.enum"
+                    :items="selectFieldItemObjectConverter(field)"
                     outlined
                     :hint="field.description"
                     persistent-hint
@@ -73,6 +73,11 @@ export default {
         this.value = val
         this.initContent(this.schema, this.value)
       }
+    },
+    selectFieldItemObjectConverter() {
+      return (fieldObject) => fieldObject.enum.map((item, index) => {
+        return {label: fieldObject.enumName[index], value: item}
+      })
     }
   },
   data() {
