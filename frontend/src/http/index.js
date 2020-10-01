@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-axios.defaults.baseURL = '/';
+axios.defaults.baseURL = process.env.VUE_APP_BASE_API;
 
 /**
  * 封装get方法

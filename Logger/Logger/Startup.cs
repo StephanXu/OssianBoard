@@ -33,7 +33,11 @@ namespace Logger
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("myAllowSpecificOrigins",
+                    builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); });
+            });
             services.AddSignalR(option => { option.MaximumReceiveMessageSize = null; })
                 .AddMessagePackProtocol()
                 .AddJsonProtocol();
@@ -118,6 +122,7 @@ namespace Logger
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseCors("myAllowSpecificOrigins");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
