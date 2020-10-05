@@ -8,7 +8,7 @@ process.env.NODE_ENV = 'production'
 function createWindow() {
   // 创建浏览器窗口
   const win = new BrowserWindow({
-    width: 960,
+    width: 1280,
     height: 720,
     webPreferences: {
       nodeIntegration: true

@@ -48,16 +48,20 @@
               </v-btn>
               <v-btn small depressed v-if="!isNew" color="error" class="mt-2" @click="handleDelete"
                      :loading="isDeleting">
-                <v-icon left>mdi-delete</v-icon>
+                <v-icon left>delete</v-icon>
                 Delete
+              </v-btn>
+              <v-btn small depressed v-if="!isNew" class="mt-2" @click="isShowRaw=!isShowRaw">
+                <v-icon left>code</v-icon>
+                {{ isShowRaw ? 'Hide raw' : 'Show raw' }}
               </v-btn>
             </div>
           </v-container>
           <FormSchema :schema="arg.schema" v-model="arg.content"></FormSchema>
         </v-container>
       </v-col>
-      <v-col cols="6" v-if="isNew">
-        <div :style="rowStyle">
+      <v-col cols="6" v-if="isNew || isShowRaw">
+        <div :style="rowStyle" v-if="!isShowRaw">
           <editor
               v-model="newSchema"
               @init="editorInit"
@@ -66,6 +70,26 @@
               :theme="editorTheme"
               width="100%"
               height="100%">
+          </editor>
+        </div>
+        <div :style="rowStyle" v-if="isShowRaw">
+          <editor
+              v-model="rawSchema"
+              @init="editorInit"
+              :options="contentEditorOptions"
+              lang="json"
+              :theme="editorTheme"
+              width="100%"
+              height="50%">
+          </editor>
+          <editor
+              v-model="rawContent"
+              @init="editorInit"
+              :options="contentEditorOptions"
+              lang="json"
+              :theme="editorTheme"
+              width="100%"
+              height="50%">
           </editor>
         </div>
       </v-col>
@@ -124,6 +148,12 @@ export default {
         }
       }
     },
+    rawSchema() {
+      return JSON.stringify(this.arg.schema, null, 2)
+    },
+    rawContent() {
+      return JSON.stringify(this.arg.content, null, 2)
+    },
     editorTheme() {
       if (this.$vuetify.theme.dark) {
         return 'monokai'
@@ -172,6 +202,7 @@ export default {
         content: {}
       },
       isNew: false,
+      isShowRaw: false,
       newSchemaJson: '',
       editorOptions: {
         fontSize: 15,
@@ -180,6 +211,14 @@ export default {
         enableSnippets: true,
         enableLiveAutocompletion: true,
         readOnly: false
+      },
+      contentEditorOptions: {
+        fontSize: 15,
+        animatedScroll: true,
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true,
+        readOnly: true
       },
       isSaving: false,
       successTip: {
