@@ -17,14 +17,17 @@ namespace Logger.Hubs
     public class LoggerHub : Hub
     {
         private readonly ILogService _logService;
+        private readonly IArgumentsService _argumentsService;
         private readonly IHubContext<LogViewerHub> _logViewerHub;
 
         public LoggerHub(
             ILogService logService,
-            IHubContext<LogViewerHub> logViewerHub)
+            IHubContext<LogViewerHub> logViewerHub,
+            IArgumentsService argumentsService)
         {
             _logService = logService;
             _logViewerHub = logViewerHub;
+            _argumentsService = argumentsService;
         }
 
         public override async Task OnConnectedAsync()
@@ -37,13 +40,22 @@ namespace Logger.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task<string> CreateLog(string name, string description)
+        public async Task<string> CreateLog(string name, string description, string argumentId)
         {
             var log = await _logService.CreateLog(name, description);
+            if (log == null)
+            {
+                return "error";
+            }
+
+            var snapshot = _argumentsService.CreateSnapshot(argumentId,
+                "Auto snapshot-" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _argumentsService.BindSnapshotForLog(log.Id, snapshot.Id);
+            
             await _logViewerHub.Clients.All.SendAsync(
                 "RefreshLogsList",
                 _logService.ListLogs());
-            return log == null ? "error" : log.Id;
+            return log.Id;
         }
 
         public async Task AddLog(string logId, IEnumerable<string> logs)

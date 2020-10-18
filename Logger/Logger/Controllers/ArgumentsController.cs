@@ -28,8 +28,12 @@ namespace Logger.Controllers
 
         [HttpGet("{argId}")]
         [AllowAnonymous]
-        public ActionResult GetSingleArgument([FromRoute] string argId) =>
-            Ok(_argumentsService.GetSingleArgument(argId));
+        public ActionResult GetSingleArgument([FromRoute] string argId, [FromQuery(Name = "pt")] bool pureText)
+        {
+            var arg = _argumentsService.GetSingleArgument(argId);
+            return pureText ? Ok(arg.Content) : Ok(arg);
+        }
+            
 
         [HttpGet("{argId}/snapshot")]
         public ActionResult ListSnapshot([FromRoute] string argId) =>
@@ -71,7 +75,6 @@ namespace Logger.Controllers
             {
                 _argumentsService.BindSnapshotForLog(logId, snapshot.Id);
             }
-
             return Ok(snapshot);
         }
 

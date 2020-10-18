@@ -151,8 +151,13 @@ export default {
     rawSchema() {
       return JSON.stringify(this.arg.schema, null, 2)
     },
-    rawContent() {
-      return JSON.stringify(this.arg.content, null, 2)
+    rawContent: {
+      get() {
+        console.log(this.arg.content)
+        return JSON.stringify(this.arg.content, null, 2)
+      },
+      set() {
+      }
     },
     editorTheme() {
       if (this.$vuetify.theme.dark) {

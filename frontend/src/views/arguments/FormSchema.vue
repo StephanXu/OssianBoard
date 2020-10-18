@@ -19,8 +19,18 @@
                   :key="fieldIndex"
                   class="mt-2">
                 <v-text-field
-                    v-if="field.component==='text'"
-                    v-model="refreshedValue[index][cardIndex][fieldIndex]"
+                    v-if="field.component==='text' && field.type==='string'"
+                    type="text"
+                    v-model.trim="refreshedValue[index][cardIndex][fieldIndex]"
+                    :label="field.title"
+                    outlined
+                    :hint="field.description"
+                    persistent-hint>
+                </v-text-field>
+                <v-text-field
+                    v-if="field.component==='text' && field.type==='number'"
+                    type="number"
+                    v-model.number="refreshedValue[index][cardIndex][fieldIndex]"
                     :label="field.title"
                     outlined
                     :hint="field.description"
@@ -91,6 +101,8 @@ export default {
         if (schema.properties[prop].type === 'object') {
           curtContent[prop] = curtContent.hasOwnProperty(prop) ? curtContent[prop] : {}
           this.initContent(schema.properties[prop], curtContent[prop])
+        } else if (schema.properties[prop].type === 'number') {
+          curtContent[prop] = curtContent.hasOwnProperty(prop) ? curtContent[prop] : 0
         } else {
           curtContent[prop] = curtContent.hasOwnProperty(prop) ? curtContent[prop] : ''
         }

@@ -115,7 +115,6 @@ export default {
   },
   data() {
     return {
-      fab: false,
       onlineVariants: [],
       figures: [],
       prettier: true,
@@ -142,7 +141,7 @@ export default {
         recordCount: 0,
       },
       activePlot: 0,
-      configurationData: {},
+      autoSnapshot: null,
       isDeleting: false
     };
   },
@@ -160,10 +159,10 @@ export default {
       return this.logId == "index" || this.logId == "";
     },
     configTreeView() {
-      return this.configTree(this.configurationData, 0);
+      return this.configTree(JSON.parse(this.autoSnapshot.content), 0);
     },
     haveConfigTreeView() {
-      return this.configurationData != {};
+      return this.autoSnapshot != null;
     },
     scrollbarTheme() {
       return this.$vuetify.theme.dark ? 'dark' : 'light'
@@ -221,7 +220,7 @@ export default {
         this.plotLoading = false;
         this.loading = false;
       });
-      this.configurationData = await getArchivedConfiguration(this.logId);
+      this.autoSnapshot = await getArchivedConfiguration(this.logId);
     });
   },
   async destroyed() {

@@ -23,7 +23,7 @@ namespace Logger.Services
         public IEnumerable<ArgumentSnapshotMeta> ListSnapshot(string argId);
         public ArgumentSnapshotModel GetSingleSnapshot(string snapshotId);
         public void UpdateArguments(string argId, ArgumentModel argument);
-        public ArgumentSnapshotMeta CreateSnapshot(string argId, string name);
+        public ArgumentSnapshotModel CreateSnapshot(string argId, string name);
         public void RemoveSnapshot(string snapshotId);
         public void BindSnapshotForLog(string logId, string snapshotId);
         public void UnbindSnapshotFromLogId(string logId);
@@ -45,7 +45,7 @@ namespace Logger.Services
             var database = client.GetDatabase(config.GetConnectionString("DatabaseName"));
             _arguments = database.GetCollection<ArgumentModel>("arguments");
             _snapshots = database.GetCollection<ArgumentSnapshotModel>("argumentsSnapshots");
-            _snapshotsWithLog = database.GetCollection<LogWithArgumentSnapshot>("arguments");
+            _snapshotsWithLog = database.GetCollection<LogWithArgumentSnapshot>("argSnapRelWithLog");
             _logCollection = database.GetCollection<LogModel>("logs");
         }
 
@@ -101,7 +101,7 @@ namespace Logger.Services
             _arguments.ReplaceOne(item => item.Id == argId, argument);
         }
 
-        public ArgumentSnapshotMeta CreateSnapshot(string argId, string name)
+        public ArgumentSnapshotModel CreateSnapshot(string argId, string name)
         {
             var arg = _arguments.AsQueryable().FirstOrDefault(argument => argument.Id == argId);
             if (arg == null)
@@ -121,13 +121,7 @@ namespace Logger.Services
 
             _snapshots.InsertOne(snapshot);
 
-            return new ArgumentSnapshotMeta
-            {
-                CreateTime = snapshot.CreateTime,
-                Id = snapshot.Id,
-                Name = snapshot.Name,
-                Tag = snapshot.Tag
-            };
+            return snapshot;
         }
 
         public void RemoveSnapshot(string snapshotId)
