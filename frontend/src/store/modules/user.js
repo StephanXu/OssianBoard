@@ -7,6 +7,7 @@ import {
     getInfo,
     logout
 } from '@/api/user'
+import store from "@/store";
 
 
 export default {
@@ -25,6 +26,7 @@ export default {
     },
     mutations: {
         SET_TOKEN: (state, token) => {
+            setToken(token)
             state.token = token
         },
         SET_NAME: (state, name) => {
@@ -58,7 +60,6 @@ export default {
                     commit('SET_TOKEN', token)
                     commit('SET_ALIAS', alias)
                     commit('SET_NAME', userName)
-                    setToken(token)
                     resolve()
                 }).catch((err) => {
                     reject(err)
@@ -89,6 +90,10 @@ export default {
                     commit('SET_ALIAS', alias)
                     resolve(data)
                 }).catch(error => {
+                    // to re-login
+                    store.dispatch('user/resetToken').then(() => {
+                        location.reload()
+                    })
                     reject(error)
                 })
             })
@@ -111,5 +116,12 @@ export default {
                 })
             })
         },
+
+        async resetToken({commit}) {
+            commit('SET_TOKEN', '')
+            commit('SET_NAME', '')
+            commit('SET_ROLES', [])
+            removeToken()
+        }
     }
 }

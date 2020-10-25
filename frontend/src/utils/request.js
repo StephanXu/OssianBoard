@@ -30,7 +30,6 @@ service.interceptors.response.use(
     },
     error => {
         if (error.status === 401) {
-            console.log('dick')
             // to re-login
             store.dispatch('user/resetToken').then(() => {
                 location.reload()

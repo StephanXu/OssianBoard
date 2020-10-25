@@ -14,9 +14,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Logger.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MongoDB.Bson.IO;
 
 namespace Logger
 {
@@ -35,8 +37,12 @@ namespace Logger
             services.AddControllers();
             services.AddCors(options =>
             {
-                options.AddPolicy("myAllowSpecificOrigins",
-                    builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); });
+                options.AddPolicy("myAllowSpecificOrigins", builder =>
+                    builder.SetIsOriginAllowed(_ => true)
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                );
             });
             services.AddSignalR(option => { option.MaximumReceiveMessageSize = null; })
                 .AddMessagePackProtocol()
@@ -105,6 +111,7 @@ namespace Logger
                             return Task.CompletedTask;
                         }
                     };
+                    
                 });
         }
 
