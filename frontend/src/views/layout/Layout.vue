@@ -1,23 +1,21 @@
 <template>
   <v-app id="inspire">
-    <component :is="currentNavigatorDrawer" v-model="drawer" />
-    <v-app-bar
-      app
-      clipped-left
-      color="blue darken-3"
-      dark
-      src="https://picsum.photos/1920/1080?random"
-    >
-      <template v-slot:img="{ props }">
-        <v-img
-          v-bind="props"
-          gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"
-        ></v-img>
-      </template>
+    <transition name="slide-fade" mode="out-in">
+      <component :is="rightNavigatorDrawer" v-model="rightDrawer"></component>
+    </transition>
+    <component :is="currentNavigatorDrawer" v-model="drawer"></component>
 
+    <v-app-bar
+        app
+        clipped-left
+        clipped-right
+        outlined
+        flat
+        dense
+    >
       <v-app-bar-nav-icon
-        v-if="currentNavigatorDrawer"
-        @click.stop="drawer = !drawer"
+          v-if="currentNavigatorDrawer"
+          @click.stop="drawer = !drawer"
       />
 
       <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
@@ -29,35 +27,28 @@
       <v-btn icon>
         <v-icon @click="switchTheme">invert_colors</v-icon>
       </v-btn>
-
-      <template v-slot:extension>
-        <v-tabs align-with-title dark background-color="transparent">
-          <v-tab
-            v-for="item in items"
-            :key="item.title"
-            link
-            :to="item.redirect"
-            >{{ item.title }}</v-tab
-          >
-        </v-tabs>
-      </template>
     </v-app-bar>
 
-    <v-content>
+    <v-main>
       <transition name="slide-fade" mode="out-in">
-        <router-view :key="key" />
+        <router-view :key="key"/>
       </transition>
-    </v-content>
+    </v-main>
 
-    <v-footer app>
-      <span>&copy; 2020</span>
+    <v-footer app outlined>
+      <v-row no-gutters>
+        <v-col class="text-center" cols="12">
+          {{ new Date().getFullYear() }} — <strong>Ossian Board</strong>
+        </v-col>
+      </v-row>
     </v-footer>
   </v-app>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import {mapGetters} from "vuex";
 import DefaultNavigator from "./DefaultNavigator";
+
 export default {
   components: {
     DefaultNavigator,
@@ -67,6 +58,7 @@ export default {
   },
   data: () => ({
     drawer: null,
+    rightDrawer: true,
     items: [
       {
         icon: "mdi-view-dashboard",
@@ -93,12 +85,15 @@ export default {
     currentNavigatorDrawer() {
       return this.$route.meta.drawer;
     },
+    rightNavigatorDrawer() {
+      return this.$route.meta.rightDrawer;
+    }
   },
   methods: {
     switchTheme() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
     },
-  },
+  }
 };
 </script>
 
@@ -106,13 +101,16 @@ export default {
 .slide-fade-enter-active {
   transition: all 0.3s ease;
 }
+
 .slide-fade-leave-active {
   transition: all 0.1s ease;
 }
+
 .slide-fade-enter {
   transform: translateX(10px);
   opacity: 0;
 }
+
 .slide-fade-leave-to {
   transform: translateX(-10px);
   opacity: 0;

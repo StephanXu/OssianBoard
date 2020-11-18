@@ -1,0 +1,32 @@
+{
+  "name": "ossian-board-client",
+  "version": "1.0.3",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64"
+  },
+  "author": "Stephan Xu",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^10.1.2",
+    "electron-builder": "^22.8.1"
+  },
+  "build": {
+    "appId": "com.ossianboard.app",
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "fav.ico",
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    }
+  }
+}

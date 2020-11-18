@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Logger.Models;
-using Logger.Protos;
 using Microsoft.AspNetCore.SignalR;
 using Logger.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -18,8 +17,8 @@ namespace Logger.Hubs
     public class LoggerHub : Hub
     {
         private readonly ILogService _logService;
-        private readonly IHubContext<LogViewerHub> _logViewerHub;
         private readonly IArgumentsService _argumentsService;
+        private readonly IHubContext<LogViewerHub> _logViewerHub;
 
         public LoggerHub(
             ILogService logService,
@@ -41,25 +40,28 @@ namespace Logger.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task<string> CreateLog(string name, string description)
+        public async Task<string> CreateLog(string name, string description, string argumentId)
         {
             var log = await _logService.CreateLog(name, description);
+            if (log == null)
+            {
+                return "error";
+            }
+
+            var snapshot = _argumentsService.CreateSnapshot(argumentId,
+                "Auto snapshot-" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _argumentsService.BindSnapshotForLog(log.Id, snapshot.Id);
+            
             await _logViewerHub.Clients.All.SendAsync(
                 "RefreshLogsList",
                 _logService.ListLogs());
-            return log == null ? "error" : log.Id;
+            return log.Id;
         }
 
         public async Task AddLog(string logId, IEnumerable<string> logs)
         {
             var records = await _logService.AddRecord(logId, logs);
             await _logViewerHub.Clients.Group("Listen" + logId).SendAsync("ReceiveLog", records);
-        }
-
-        public void ArchiveConfiguration(string logId, string configuration)
-        {
-            var config = Configuration.Parser.ParseJson(configuration);
-            _argumentsService.ArchiveArguments(logId, config);
         }
     }
 }

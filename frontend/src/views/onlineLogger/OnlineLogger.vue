@@ -1,87 +1,108 @@
 <template>
-  <v-container fluid>
-    <v-row align="center" justify="center">
-      <v-col cols="12">
-        <v-card v-if="!isEmptyId">
-          <v-row no-gutters>
-            <v-col cols="12">
-              <v-card flat>
-                <v-tabs v-model="activePlot" grow>
-                  <v-tab v-for="item in figures" :key="item.name">
-                    {{ item.name }}
-                  </v-tab>
-                </v-tabs>
-                <plot
-                  style="height: 550px; width: 100%; padding-bottom:50px"
-                  :values="figures[activePlot].variables"
-                  @click="handlePlotClick"
-                ></plot>
-              </v-card>
-            </v-col>
-          </v-row>
-          <v-divider />
-          <v-row no-gutters>
-            <v-col cols="12">
-              <v-card flat>
-                <v-data-table
-                  fixed-header
-                  dense
-                  calculate-widths
-                  :headers="logTableHeader"
-                  :items="logs"
-                  item-key="id"
-                  :server-items-length="logMeta.recordCount"
-                  :items-per-page="itemsPerPage"
-                  :page="currentPage"
-                  @pagination="handlePagination"
-                  :loading="loading"
-                >
-                  <template v-slot:top>
-                    <v-toolbar flat>
-                      <v-toolbar-title>Raw log</v-toolbar-title>
-                      <v-spacer></v-spacer>
-                      <v-switch
-                        v-model="prettier"
-                        label="Prettier"
-                        class="mt-2"
-                        disabled
-                      ></v-switch>
-                    </v-toolbar>
-                  </template>
-                  <template v-slot:item.level="{ item }">
-                    <v-chip x-small :color="getLogColor(item.level)" dark>
-                      {{ item.level }}
-                    </v-chip>
-                  </template>
-                </v-data-table>
-              </v-card>
-            </v-col>
-          </v-row>
-          <v-divider />
-          <v-row>
-            <v-col cols="12">
-              <v-card flat>
-                <v-card-title>Configuration</v-card-title>
-                <v-treeview
-                  dense
-                  transition
-                  :items="configTreeView"
-                  class="overflow-y-auto"
-                  style="height:250px"
-                ></v-treeview>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div :class="scrollbarTheme" :style="rowStyle">
+    <v-container fluid v-if="isEmptyId" class="d-flex">
+    </v-container>
+
+    <v-container v-if="!isEmptyId" fluid class="d-flex justify-space-between flex-wrap">
+      <div>
+        <h1>{{ logMeta.name }}</h1>
+        <p class="text-subtitle-1">{{ logMeta.description }}</p>
+        <v-subheader class="ml-n4">{{ presentCreateTime }}</v-subheader>
+      </div>
+      <div class="d-flex flex-column">
+        <v-btn small depressed color="error" class="mt-2" @click="handleDelete"
+               :loading="isDeleting">
+          <v-icon left>mdi-delete</v-icon>
+          Delete
+        </v-btn>
+      </div>
+    </v-container>
+
+    <v-container fluid>
+      <v-row align="center" justify="center">
+        <v-col cols="12">
+          <v-card v-if="!isEmptyId">
+            <v-row no-gutters>
+              <v-col cols="12">
+                <v-card flat>
+                  <v-tabs v-model="activePlot" background-color="transparent">
+                    <v-tab v-for="item in figures" :key="item.name">
+                      {{ item.name }}
+                    </v-tab>
+                  </v-tabs>
+                  <plot
+                      style="height: 550px; width: 100%; padding-bottom:50px"
+                      :values="figures[activePlot].variables"
+                      @click="handlePlotClick"
+                  ></plot>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-divider/>
+            <v-row no-gutters>
+              <v-col cols="12">
+                <v-card flat>
+                  <v-data-table
+                      fixed-header
+                      dense
+                      calculate-widths
+                      :headers="logTableHeader"
+                      :items="logs"
+                      item-key="id"
+                      :server-items-length="logMeta.recordCount"
+                      :items-per-page="itemsPerPage"
+                      :page="currentPage"
+                      @pagination="handlePagination"
+                      :loading="loading"
+                  >
+                    <template v-slot:top>
+                      <v-toolbar flat>
+                        <v-toolbar-title>Raw log</v-toolbar-title>
+                        <v-spacer></v-spacer>
+                        <v-switch
+                            v-model="prettier"
+                            label="Prettier"
+                            class="mt-2"
+                            disabled
+                        ></v-switch>
+                      </v-toolbar>
+                    </template>
+                    <template v-slot:item.level="{ item }">
+                      <v-chip x-small :color="getLogColor(item.level)" dark>
+                        {{ item.level }}
+                      </v-chip>
+                    </template>
+                  </v-data-table>
+                </v-card>
+              </v-col>
+            </v-row>
+            <v-divider/>
+            <v-row>
+              <v-col cols="12">
+                <v-card flat>
+                  <v-card-title>Configuration</v-card-title>
+                  <v-treeview
+                      dense
+                      transition
+                      :items="configTreeView"
+                      class="overflow-y-auto"
+                      style="height:250px"
+                  ></v-treeview>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script>
 import Plot from "./components/Plot";
-import { mapGetters } from "vuex";
-import { getLog, getLogByTime, getArchivedConfiguration } from "@/api/log";
+import {mapGetters} from "vuex";
+import {getLog, getLogByTime, getArchivedConfiguration, removeLog} from "@/api/log";
+
 export default {
   components: {
     Plot,
@@ -94,7 +115,6 @@ export default {
   },
   data() {
     return {
-      fab: false,
       onlineVariants: [],
       figures: [],
       prettier: true,
@@ -105,9 +125,9 @@ export default {
           value: "time",
           width: "20%",
         },
-        { text: "Thread", value: "threadId", width: "10%" },
-        { text: "Level", value: "level", width: "10%" },
-        { text: "Content", value: "content" },
+        {text: "Thread", value: "threadId", width: "10%"},
+        {text: "Level", value: "level", width: "10%"},
+        {text: "Content", value: "content"},
       ],
       loading: false,
       plotLoading: false,
@@ -121,11 +141,13 @@ export default {
         recordCount: 0,
       },
       activePlot: 0,
-      configurationData: {},
+      autoSnapshot: null,
+      isDeleting: false
     };
   },
   computed: {
     ...mapGetters("log", ["connection", "connectionStatus", "logList"]),
+    ...mapGetters("view", ["clientHeight"]),
     connected() {
       try {
         return this.connection.connectionState === "Connected";
@@ -137,11 +159,23 @@ export default {
       return this.logId == "index" || this.logId == "";
     },
     configTreeView() {
-      return this.configTree(this.configurationData, 0);
+      return this.configTree(JSON.parse(this.autoSnapshot.content), 0);
     },
     haveConfigTreeView() {
-      return this.configurationData != {};
+      return this.autoSnapshot != null;
     },
+    scrollbarTheme() {
+      return this.$vuetify.theme.dark ? 'dark' : 'light'
+    },
+    rowStyle() {
+      return {
+        'overflow-y': 'auto',
+        'height': `${this.clientHeight - this.$vuetify.application.top - this.$vuetify.application.footer}px`
+      }
+    },
+    presentCreateTime() {
+      return `Created at ${this.logMeta.createTime}`
+    }
   },
   async created() {
     this.$nextTick(async () => {
@@ -154,11 +188,11 @@ export default {
 
       let logMetaCache = this.logList.find((item) => item.id === this.logId);
       this.logMeta =
-        logMetaCache == null
-          ? await this.connection.invoke("GetLogMeta", this.logId)
-          : logMetaCache;
+          logMetaCache == null
+              ? await this.connection.invoke("GetLogMeta", this.logId)
+              : logMetaCache;
       if (this.logMeta == null) {
-        this.$router.push({ path: "/board/index" });
+        this.$router.push({path: "/board/index"});
       }
 
       this.connection.on("ReceiveLog", (increment) => {
@@ -167,13 +201,13 @@ export default {
         if (this.currentPage == 1) {
           if (increment.records.length >= this.itemsPerPage) {
             this.logs = this.processLogs(
-              increment.records.slice(0, this.itemsPerPage)
+                increment.records.slice(0, this.itemsPerPage)
             );
           } else {
             this.logs = this.processLogs(
-              this.logs
-                .slice(0, this.itemsPerPage - increment.records.length)
-                .concat(increment.records)
+                this.logs
+                    .slice(0, this.itemsPerPage - increment.records.length)
+                    .concat(increment.records)
             );
           }
         }
@@ -186,7 +220,7 @@ export default {
         this.plotLoading = false;
         this.loading = false;
       });
-      this.configurationData = await getArchivedConfiguration(this.logId);
+      this.autoSnapshot = await getArchivedConfiguration(this.logId);
     });
   },
   async destroyed() {
@@ -199,7 +233,7 @@ export default {
     mergePlot(plots) {
       plots.forEach((element) => {
         let plotIndex = this.figures.findIndex(
-          (item) => item.name === element.name
+            (item) => item.name === element.name
         );
         if (plotIndex == -1) {
           this.figures.push(element);
@@ -207,7 +241,7 @@ export default {
         }
         element.variables.forEach((variable) => {
           let variableIndex = this.figures[plotIndex].variables.findIndex(
-            (item) => item.name === variable.name
+              (item) => item.name === variable.name
           );
           if (variableIndex == -1) {
             variable.dots.sort((lhs, rhs) => lhs.time - rhs.time);
@@ -216,10 +250,10 @@ export default {
           }
           let dots = this.figures[plotIndex].variables[variableIndex].dots;
           this.figures[plotIndex].variables[variableIndex].dots = dots.concat(
-            variable.dots
+              variable.dots
           );
           this.figures[plotIndex].variables[variableIndex].dots.sort(
-            (lhs, rhs) => lhs.time - rhs.time
+              (lhs, rhs) => lhs.time - rhs.time
           );
         });
       });
@@ -228,7 +262,7 @@ export default {
       try {
         let figureName = log.content.match(/@(\w+)/)[1];
         let figureIndex = this.figures.findIndex(
-          (item) => item.name === figureName
+            (item) => item.name === figureName
         );
         if (figureIndex == -1) {
           this.figures.push({
@@ -240,12 +274,12 @@ export default {
         const regexAssignPattern = /\$(?<varName>\w+)\s*=\s*(?<value>[-0-9e+.]*)/g;
         let assignMatch = null;
         while (
-          (assignMatch = regexAssignPattern.exec(
-            log.content.match(/\[(.*?)\]/)[1]
-          ))
-        ) {
+            (assignMatch = regexAssignPattern.exec(
+                log.content.match(/\[(.*?)\]/)[1]
+            ))
+            ) {
           let varIndex = this.figures[figureIndex].variables.findIndex(
-            (item) => item.varName === assignMatch.groups.varName
+              (item) => item.varName === assignMatch.groups.varName
           );
           if (varIndex == -1) {
             this.figures[figureIndex].variables.push({
@@ -255,10 +289,10 @@ export default {
             });
           } else {
             this.figures[figureIndex].variables[varIndex].times.push(
-              new Date(log.time)
+                new Date(log.time)
             );
             this.figures[figureIndex].variables[varIndex].values.push(
-              Number(assignMatch.groups.value)
+                Number(assignMatch.groups.value)
             );
           }
         }
@@ -275,11 +309,11 @@ export default {
       else if (level === "critical") return "red";
       return "";
     },
-    async handlePagination({ page, itemsPerPage }) {
+    async handlePagination({page, itemsPerPage}) {
       if (
-        this.currentPage == page &&
-        itemsPerPage == this.itemsPerPage &&
-        this.logs.length != 0
+          this.currentPage == page &&
+          itemsPerPage == this.itemsPerPage &&
+          this.logs.length != 0
       ) {
         return;
       }
@@ -287,16 +321,16 @@ export default {
       this.currentPage = page;
       this.itemsPerPage = itemsPerPage;
       this.logs = this.processLogs(
-        await getLog(this.logId, page, itemsPerPage)
+          await getLog(this.logId, page, itemsPerPage)
       );
       this.loading = false;
     },
-    async handlePlotClick({ data }) {
+    async handlePlotClick({data}) {
       this.loading = true;
-      let { page, records } = await getLogByTime(
-        this.logId,
-        data[0],
-        this.itemsPerPage
+      let {page, records} = await getLogByTime(
+          this.logId,
+          data[0],
+          this.itemsPerPage
       );
       this.currentPage = page;
       this.logs = this.processLogs(records);
@@ -330,6 +364,14 @@ export default {
       }
       return res;
     },
+    async handleDelete() {
+      this.isDeleting = true
+      this.deletingLogId = this.logMeta.id;
+      await removeLog(this.curtMenuLogId);
+      await this.$store.dispatch("log/refreshLogList");
+      this.isDeleting = false
+      this.$router.push({path: "/board/index"});
+    }
   },
 };
 </script>

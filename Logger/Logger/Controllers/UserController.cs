@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver.Core.Authentication;
 using Logger.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Logger.Controllers
 {
@@ -30,7 +31,7 @@ namespace Logger.Controllers
             var profile = _userService.GetProfile(HttpContext.User.Identity.Name);
             if (null == profile)
             {
-                return BadRequest("Not valid");
+                return Unauthorized("Not valid");
             }
 
             return Ok(profile);

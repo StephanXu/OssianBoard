@@ -59,7 +59,7 @@ export function getLogByTime(logId, time, itemsPerPage) {
 
 export function getArchivedConfiguration(logId) {
     return request({
-        url: `log/${logId}/config`,
+        url: `log/${logId}/argument`,
         method: 'get'
     })
 }

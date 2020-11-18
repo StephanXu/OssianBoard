@@ -7,6 +7,7 @@ import {
     getInfo,
     logout
 } from '@/api/user'
+import store from "@/store";
 
 
 export default {
@@ -25,6 +26,7 @@ export default {
     },
     mutations: {
         SET_TOKEN: (state, token) => {
+            setToken(token)
             state.token = token
         },
         SET_NAME: (state, name) => {
@@ -39,8 +41,8 @@ export default {
     },
     actions: {
         login({
-            commit
-        }, userInfo) {
+                  commit
+              }, userInfo) {
             const {
                 username,
                 password
@@ -58,17 +60,16 @@ export default {
                     commit('SET_TOKEN', token)
                     commit('SET_ALIAS', alias)
                     commit('SET_NAME', userName)
-                    setToken(token)
                     resolve()
-                }).catch(error => {
-                    reject(error)
+                }).catch((err) => {
+                    reject(err)
                 })
             })
         },
         // get user info
         getInfo({
-            commit
-        }) {
+                    commit
+                }) {
             return new Promise((resolve, reject) => {
                 getInfo().then(response => {
                     const data = response
@@ -89,6 +90,10 @@ export default {
                     commit('SET_ALIAS', alias)
                     resolve(data)
                 }).catch(error => {
+                    // to re-login
+                    store.dispatch('user/resetToken').then(() => {
+                        location.reload()
+                    })
                     reject(error)
                 })
             })
@@ -96,9 +101,9 @@ export default {
 
         // user logout
         logout({
-            commit,
-            state
-        }) {
+                   commit,
+                   state
+               }) {
             return new Promise((resolve, reject) => {
                 logout(state.token).then(() => {
                     commit('SET_TOKEN', '')
@@ -111,5 +116,12 @@ export default {
                 })
             })
         },
+
+        async resetToken({commit}) {
+            commit('SET_TOKEN', '')
+            commit('SET_NAME', '')
+            commit('SET_ROLES', [])
+            removeToken()
+        }
     }
 }

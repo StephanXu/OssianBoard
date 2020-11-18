@@ -1,7 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="drawer" app clipped width="400px">
-    <v-divider />
-
+  <v-navigation-drawer v-model="value" app right clipped width="400px">
     <v-item-group v-model="selectedLogIndex">
       <v-container>
         <v-row v-for="item in logList" :key="item.id">
@@ -165,9 +163,6 @@ export default {
     async logout() {
       await this.$store.dispatch("user/logout");
       this.$router.push({ path: "/login" });
-    },
-    switchPage(row) {
-      this.$router.push({ path: row.redirect });
     },
     handleContextMenu(event, logId) {
       this.showMenu = false;

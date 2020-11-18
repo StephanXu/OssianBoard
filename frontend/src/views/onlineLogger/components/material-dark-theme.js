@@ -67,7 +67,7 @@
     ];
     var theme = {
         color: colorPalette,
-        backgroundColor: '#424242',
+        backgroundColor: '#1e1e1e',
         tooltip: {
             axisPointer: {
                 lineStyle: {

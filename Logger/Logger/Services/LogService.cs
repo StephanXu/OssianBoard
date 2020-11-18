@@ -29,23 +29,23 @@ namespace Logger.Services
 
     public class LogService : ILogService
     {
+        private readonly IArgumentsService _argumentsService;
         private readonly IMongoCollection<LogModel> _logCollection;
         private readonly IMongoCollection<RecordModel> _recordCollection;
         private readonly IMongoCollection<PlotModel> _plotCollection;
         private readonly IMongoCollection<VariableModel> _variableCollection;
         private readonly IMongoCollection<DotModel> _dotCollection;
-        private readonly IMongoCollection<ConfigurationModel> _archiveConfig;
 
-        public LogService(IConfiguration config)
+        public LogService(IConfiguration config, IArgumentsService argumentsService)
         {
-            var client = new MongoClient(config.GetConnectionString("OnlineLogger"));
-            var database = client.GetDatabase("OnlineLogger");
+            _argumentsService = argumentsService;
+            var client = new MongoClient(config.GetConnectionString("DatabaseConnection"));
+            var database = client.GetDatabase(config.GetConnectionString("DatabaseName"));
             _logCollection = database.GetCollection<LogModel>("logs");
             _recordCollection = database.GetCollection<RecordModel>("records");
             _plotCollection = database.GetCollection<PlotModel>("plots");
             _variableCollection = database.GetCollection<VariableModel>("variables");
             _dotCollection = database.GetCollection<DotModel>("dots");
-            _archiveConfig = database.GetCollection<ConfigurationModel>("archiveConfig");
         }
 
         public IEnumerable<RecordModel> GetLog(string logId, int page, int itemsPerPage) =>
@@ -314,7 +314,7 @@ namespace Logger.Services
             await _variableCollection.DeleteManyAsync(item => item.LogId == logId);
             await _plotCollection.DeleteManyAsync(item => item.LogId == logId);
             await _logCollection.DeleteOneAsync(item => item.Id == log.Id);
-            await _archiveConfig.DeleteOneAsync(item => item.LogId == log.Id);
+            _argumentsService.UnbindSnapshotFromLogId(logId);
             return log;
         }
     }
