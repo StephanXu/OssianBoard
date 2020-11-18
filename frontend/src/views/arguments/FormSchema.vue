@@ -57,6 +57,8 @@
 </template>
 
 <script>
+import {initSchemaContent} from '@/utils/utility'
+
 export default {
   name: "FormSchema",
   props: {
@@ -76,12 +78,12 @@ export default {
   computed: {
     refreshedValue: {
       get() {
-        this.initContent(this.schema, this.value)
+        initSchemaContent(this.schema, this.value)
         return this.value
       },
       set(val) {
         this.value = val
-        this.initContent(this.schema, this.value)
+        initSchemaContent(this.schema, this.value)
       }
     },
     selectFieldItemObjectConverter() {
@@ -93,20 +95,6 @@ export default {
   data() {
     return {
       tabIndex: 0
-    }
-  },
-  methods: {
-    initContent(schema, curtContent) {
-      for (const prop in schema.properties) {
-        if (schema.properties[prop].type === 'object') {
-          curtContent[prop] = curtContent.hasOwnProperty(prop) ? curtContent[prop] : {}
-          this.initContent(schema.properties[prop], curtContent[prop])
-        } else if (schema.properties[prop].type === 'number') {
-          curtContent[prop] = curtContent.hasOwnProperty(prop) ? curtContent[prop] : 0
-        } else {
-          curtContent[prop] = curtContent.hasOwnProperty(prop) ? curtContent[prop] : ''
-        }
-      }
     }
   },
   async updated() {

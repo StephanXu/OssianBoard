@@ -55,6 +55,10 @@
                 <v-icon left>code</v-icon>
                 {{ isShowRaw ? 'Hide raw' : 'Show raw' }}
               </v-btn>
+              <v-btn small depressed v-if="!isNew" class="mt-2" @click="isImportDialogVisible=true">
+                <v-icon left>mdi-file-import</v-icon>
+                Import
+              </v-btn>
             </div>
           </v-container>
           <FormSchema :schema="arg.schema" v-model="arg.content"></FormSchema>
@@ -95,6 +99,11 @@
       </v-col>
     </v-row>
     <snapshot-list :arg-id="this.argId" v-model="isSnapshotListVisible"></snapshot-list>
+    <import-argument v-model="isImportDialogVisible"
+                     :schema="arg.schema"
+                     :content="arg.content"
+                     @import="onImport">
+    </import-argument>
   </div>
 </template>
 
@@ -110,11 +119,13 @@ import {
 import {mapGetters} from 'vuex'
 import FormSchema from "@/views/arguments/FormSchema";
 import SnapshotList from "@/views/arguments/SnapshotList";
+import ImportArgument from '@/views/arguments/ImportArgument';
 import {timeToString} from "@/utils/utility";
 
 export default {
   name: "Argument",
   components: {
+    ImportArgument,
     FormSchema,
     SnapshotList,
     editor: require("vue2-ace-editor")
@@ -235,7 +246,8 @@ export default {
         visible: false,
       },
       isSnapshotListVisible: false,
-      isDeleting: false
+      isDeleting: false,
+      isImportDialogVisible: false
     }
   },
   methods: {
@@ -306,6 +318,9 @@ export default {
         await this.$router.push({path: '/argument/index'})
         this.isDeleting = false
       }
+    },
+    onImport(val) {
+      this.arg.content = val
     }
   },
   async created() {
