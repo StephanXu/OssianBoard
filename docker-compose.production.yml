@@ -1,10 +1,13 @@
 version: "3"
 services:
     db:
-        image: mongo:4.0-bionic
+        image: mongo:4.4-bionic
         ports:
             - "37017:27017"
         restart: always
+        volumes:
+            - /root/mongodata:/data/db
+        command: mongo --wiredTigerCacheSizeGB 1
     static:
         image: registry.cn-hangzhou.aliyuncs.com/ossian/ossian-board-static
         ports:
