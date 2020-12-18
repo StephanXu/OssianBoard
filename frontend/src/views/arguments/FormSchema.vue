@@ -27,7 +27,8 @@
           <v-card
             v-for="(card, cardIndex) in tab.properties"
             :key="cardIndex"
-            flat
+            outlined
+            class="mt-5 ms-5 me-5"
           >
             <v-card-title>{{ card.title }}</v-card-title>
             <v-card-subtitle>{{ card.description }}</v-card-subtitle>
@@ -67,6 +68,20 @@
                   :hint="field.description"
                   persistent-hint
                 ></v-select>
+                <v-switch
+                  v-if="field.component === 'switch'"
+                  v-model="refreshedValue[index][cardIndex][fieldIndex]"
+                  :label="field.title"
+                  inset
+                ></v-switch>
+                <v-slider
+                  v-if="field.component === 'slider'"
+                  v-model="refreshedValue[index][cardIndex][fieldIndex]"
+                  :label="field.title"
+                  thumb-label
+                  :min="field.minValue"
+                  :max="field.maxValue"
+                ></v-slider>
               </div>
             </v-card-text>
           </v-card>
@@ -128,7 +143,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .menu-bar {
   position: -webkit-sticky;
   position: -moz-sticky;

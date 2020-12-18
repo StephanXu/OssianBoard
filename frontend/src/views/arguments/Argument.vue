@@ -20,7 +20,7 @@
       <v-col>
         <v-card flat :style="rowStyle" :class="scrollbarTheme">
           <v-container fluid flat class="d-flex justify-space-between flex-wrap">
-            <div>
+            <div class="ms-2">
               <v-btn color="primary" text @click="handleBackButton">
                 <v-icon left>mdi-arrow-left</v-icon>
                 Back to {{ isSnapshot ? "argument" : "list" }}
