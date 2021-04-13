@@ -6,8 +6,7 @@ services:
             - "37017:27017"
         restart: always
         volumes:
-            - /root/mongodata:/data/db
-        command: mongod --wiredTigerCacheSizeGB=1.0
+            - /var/mongodata:/data/db
     static:
         image: registry.cn-hangzhou.aliyuncs.com/ossian/ossian-board-static
         ports:
