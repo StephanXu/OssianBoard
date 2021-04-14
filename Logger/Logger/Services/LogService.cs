@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -146,16 +146,15 @@ namespace Logger.Services
             var recordCount = _recordCollection
                 .AsQueryable()
                 .Count(item => item.LogId == logId);
-            return _logCollection.AsQueryable()
-                .Select(item => new LogModel
-                {
-                    CreateTime = item.CreateTime,
-                    Description = item.Description,
-                    Id = item.Id,
-                    Name = item.Name,
-                    RecordCount = recordCount
-                })
+            var meta = _logCollection.AsQueryable()
                 .FirstOrDefault(item => item.Id == logId);
+            if (meta != null)
+            {
+                meta.RecordCount = recordCount;
+                return meta;
+            }
+
+            return null;
         }
 
         public async Task UpdateLogMeta(string logId, string name, string description)
