@@ -16,3 +16,6 @@ services:
     backend:
         image: registry.cn-hangzhou.aliyuncs.com/ossian/ossian-board-backend
         restart: always
+    uploader:
+        image: registry.cn-hangzhou.aliyuncs.com/ossian/ossian-board-uploader
+        restart: always
