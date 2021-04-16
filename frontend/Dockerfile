@@ -1,7 +1,7 @@
 FROM node:13.7 AS build
 WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
-RUN npm install --silent --registry=https://registry.npm.taobao.org
+RUN npm install --silent 
 COPY ./ .
 RUN npm run proto
 RUN npm run build
